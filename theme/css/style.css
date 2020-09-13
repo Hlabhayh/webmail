@@ -29,30 +29,7 @@
   min-height: 80px;
   padding: 10px;
 }
-.user-head .inbox-avatar {
-  float: left;
-  width: 65px;
-}
-.user-head .inbox-avatar img {
-  border-radius: 4px;
-}
-.user-head .user-name {
-  display: inline-block;
-  margin: 0 0 0 10px;
-}
-.user-head .user-name h5 {
-  font-size: 14px;
-  font-weight: 300;
-  margin-bottom: 0;
-  margin-top: 15px;
-}
-.user-head .user-name h5 a {
-  color: #fff;
-}
-.user-head .user-name span a {
-  color: #87e2e7;
-  font-size: 12px;
-}
+
 a.mail-dropdown {
   background: none repeat scroll 0 0 #80d3d9;
   border-radius: 2px;
