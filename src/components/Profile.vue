@@ -1,14 +1,14 @@
 <template>
-  <div class="user-head"  v-for="item in profile" :key="item">
+  <div class="user-head">
     <a class="inbox-avatar" href="javascript:;">
       <img width="64" hieght="60" src="@/assets/avatar.jpg"/>
     </a>
     <div class="user-name">
       <h5>
-        <a href="#">{{ item.name }}</a>
+        <a href="#">{{ profile.name }}</a>
       </h5>
       <span>
-        <a href="#">{{ item.email }}</a>
+        <a href="#">{{ profile.email }}</a>
       </span>
     </div>
     <a class="mail-dropdown pull-right" href="javascript:;">
@@ -25,13 +25,8 @@ export default {
         name: 'nalab',
         email: 'kkaef@aljef.fz',
       }
-        {
-        name: 'nalab',
-        email: 'kkaef@aljef.fz' ,
-      }  
-    ]
+    }
   }
-}
 };
 </script>
 
