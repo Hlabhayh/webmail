@@ -1,14 +1,14 @@
 <template>
-  <div class="user-head">
+  <div class="user-head"  v-for="item in profile" :key="item">
     <a class="inbox-avatar" href="javascript:;">
-      <img width="64" hieght="60" src="../assets/avatar.jpg"/>
+      <img width="64" hieght="60" src="@/assets/avatar.jpg"/>
     </a>
     <div class="user-name">
       <h5>
-        <a href="#">{{ name }}</a>
+        <a href="#">{{ item.name }}</a>
       </h5>
       <span>
-        <a href="#">{{ email }}</a>
+        <a href="#">{{ item.email }}</a>
       </span>
     </div>
     <a class="mail-dropdown pull-right" href="javascript:;">
@@ -19,12 +19,19 @@
 
 <script>
 export default {
-  name: "Profile",
-  props: {
-    name: String,
-    email: String,
-    avatar: String,
-  },
+ data() {
+    return {
+      profile: {
+        name: 'nalab',
+        email: 'kkaef@aljef.fz',
+      }
+        {
+        name: 'nalab',
+        email: 'kkaef@aljef.fz' ,
+      }  
+    ]
+  }
+}
 };
 </script>
 
@@ -53,5 +60,13 @@ export default {
 .user-head .user-name span a {
   color: #87e2e7;
   font-size: 12px;
+}
+a.mail-dropdown {
+  background: none repeat scroll 0 0 #80d3d9;
+  border-radius: 2px;
+  color: #01a7b3;
+  font-size: 10px;
+  margin-top: 20px;
+  padding: 3px 5px;
 }
 </style>
