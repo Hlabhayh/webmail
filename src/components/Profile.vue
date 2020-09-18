@@ -21,7 +21,10 @@
 export default {
  data() {
     return {
-      profile: [
+      profile: {
+        name: 'nalab',
+        email: 'kkaef@aljef.fz',
+      }
         {
         name: 'nalab',
         email: 'kkaef@aljef.fz' ,
