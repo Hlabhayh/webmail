@@ -2,35 +2,30 @@
   "name": "webmail",
   "version": "1.0.0",
   "description": "",
+  "author": "",
   "scripts": {
-    "server": "json-server db.json",
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/masix/webmail.git"
-  },
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/masix/webmail/issues"
+    "lint": "vue-cli-service lint",
+    "server": "json-server db.json"
   },
   "dependencies": {
+    "axios": "^0.20.0",
     "core-js": "^3.6.5",
-    "vue": "^3.0.0-0"
+    "jquery": "^3.5.1",
+    "vue": "^3.0.0-0",
+    "vuex": "^4.0.0-0"
   },
-  "homepage": "https://github.com/masix/webmail#readme",
   "devDependencies": {
-    "json-server": "^0.16.1",
     "@vue/cli-plugin-babel": "~4.5.0",
     "@vue/cli-plugin-eslint": "~4.5.0",
+    "@vue/cli-plugin-vuex": "~4.5.0",
     "@vue/cli-service": "~4.5.0",
     "@vue/compiler-sfc": "^3.0.0-0",
     "babel-eslint": "^10.1.0",
     "eslint": "^6.7.2",
-    "eslint-plugin-vue": "^7.0.0-0"
+    "eslint-plugin-vue": "^7.0.0-0",
+    "json-server": "^0.16.1"
   },
   "eslintConfig": {
     "root": true,
@@ -50,5 +45,14 @@
     "> 1%",
     "last 2 versions",
     "not dead"
-  ]
+  ],
+  "bugs": {
+    "url": "https://github.com/masix/webmail/issues"
+  },
+  "homepage": "https://github.com/masix/webmail#readme",
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/masix/webmail.git"
+  }
 }
