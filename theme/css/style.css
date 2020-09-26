@@ -1,37 +1,3 @@
-<template>
-  <div class="container" id="app">
-
-        <div class="mail-box">
-
-            <aside class="sm-side">
-              <profile></profile>
-              <side-navigation></side-navigation>
-            </aside>
-
-            <aside class="lg-side">
-             <inbox-body></inbox-body>
-            </aside>
-
-        </div>
-
-    </div>
-</template>
-<script>
-
-import profile from './components/Profile'
-import InboxBody from './components/InboxBody'
-import SideNavigation from './components/SideNavigation'
-
-export default {
-  components: {
-    SideNavigation,
-    InboxBody,
-    profile
-  }
-}
-</script>
-
-<style>
 .mail-box {
   border-collapse: collapse;
   border-spacing: 0;
@@ -72,7 +38,9 @@ a.mail-dropdown {
   margin-top: 20px;
   padding: 3px 5px;
 }
-
+.inbox-body {
+  padding: 20px;
+}
 .btn-compose {
   background: none repeat scroll 0 0 #ff6c60;
   color: #fff;
@@ -147,6 +115,104 @@ ul.labels-info li a i {
   font-size: 11px;
   margin-bottom: 0;
   padding: 0 22px;
+}
+.inbox-head {
+  background: none repeat scroll 0 0 #41cac0;
+  border-radius: 0 4px 0 0;
+  color: #fff;
+  min-height: 80px;
+  padding: 20px;
+}
+.inbox-head h3 {
+  display: inline-block;
+  font-weight: 300;
+  margin: 0;
+  padding-top: 6px;
+}
+.inbox-head .sr-input {
+  border: medium none;
+  border-radius: 4px 0 0 4px;
+  box-shadow: none;
+  color: #8a8a8a;
+  float: left;
+  height: 40px;
+  padding: 0 10px;
+}
+.inbox-head .sr-btn {
+  background: none repeat scroll 0 0 #00a6b2;
+  border: medium none;
+  border-radius: 0 4px 4px 0;
+  color: #fff;
+  height: 40px;
+  padding: 0 20px;
+}
+.table-inbox {
+  border: 1px solid #d3d3d3;
+  margin-bottom: 0;
+}
+.table-inbox tr td {
+  padding: 12px !important;
+}
+.table-inbox tr td:hover {
+  cursor: pointer;
+}
+.table-inbox tr td .fa-star.inbox-started,
+.table-inbox tr td .fa-star:hover {
+  color: #f78a09;
+}
+.table-inbox tr td .fa-star {
+  color: #d5d5d5;
+}
+.table-inbox tr.unread td {
+  background: none repeat scroll 0 0 #f7f7f7;
+  font-weight: 600;
+}
+ul.inbox-pagination {
+  float: right;
+}
+ul.inbox-pagination li {
+  float: left;
+}
+.mail-option {
+  display: inline-block;
+  margin-bottom: 10px;
+  width: 100%;
+}
+.mail-option .chk-all,
+.mail-option .btn-group {
+  margin-right: 5px;
+}
+.mail-option .chk-all,
+.mail-option .btn-group a.btn {
+  background: none repeat scroll 0 0 #fcfcfc;
+  border: 1px solid #e7e7e7;
+  border-radius: 3px !important;
+  color: #afafaf;
+  display: inline-block;
+  padding: 5px 10px;
+}
+.inbox-pagination a.np-btn {
+  background: none repeat scroll 0 0 #fcfcfc;
+  border: 1px solid #e7e7e7;
+  border-radius: 3px !important;
+  color: #afafaf;
+  display: inline-block;
+  padding: 5px 15px;
+}
+.mail-option .chk-all input[type="checkbox"] {
+  margin-top: 0;
+}
+.mail-option .btn-group a.all {
+  border: medium none;
+  padding: 0;
+}
+.inbox-pagination a.np-btn {
+  margin-left: 5px;
+}
+.inbox-pagination li span {
+  display: inline-block;
+  margin-right: 5px;
+  margin-top: 7px;
 }
 .fileinput-button {
   background: none repeat scroll 0 0 #eeeeee;
@@ -283,5 +349,3 @@ ul {
   padding: 0px;
   margin: 0px;
 }
-
-</style>

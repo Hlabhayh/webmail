@@ -1,4 +1,5 @@
 <template>
+<div>
   <div class="inbox-body">
                     <a href="#myModal" data-toggle="modal"  title="Compose"    class="btn btn-compose">
                         Compose
@@ -72,19 +73,33 @@
                     </li>
                 </ul>
                 <ul class="nav nav-pills nav-stacked labels-info inbox-divider">
-                    <li> <h4>Labels</h4> </li>
-                    <li> <a href="#"> <i class=" fa fa-sign-blank text-danger"></i> Work </a> </li>
-                    <li> <a href="#"> <i class=" fa fa-sign-blank text-success"></i> Design </a> </li>
-                    <li> <a href="#"> <i class=" fa fa-sign-blank text-info "></i> Family </a>
-                    </li><li> <a href="#"> <i class=" fa fa-sign-blank text-warning "></i> Friends </a>
-                    </li><li> <a href="#"> <i class=" fa fa-sign-blank text-primary "></i> Office </a>
+                    <li>
+                       <h4>Labels</h4> 
+                       </li>
+                    <li>
+                       <a href="#"> <i class=" fa fa-sign-blank text-danger"></i> Work
+                        </a> </li>
+                    <li> 
+                      <a href="#"> <i class=" fa fa-sign-blank text-success"></i> Design 
+                      </a> </li>
+                    <li> 
+                      <a href="#"> <i class=" fa fa-sign-blank text-info "></i> Family
+                       </a>
+                    </li>
+                    <li> 
+                      <a href="#"> <i class=" fa fa-sign-blank text-warning "></i> Friends 
+                    </a>
+                    </li>
+                    
+                    <li> <a href="#"> <i class=" fa fa-sign-blank text-primary "></i> Office 
+                    </a>
                     </li>
                 </ul>
+</div>
 </template>
 
 <script>
 export default {
-
 }
 </script>
 
