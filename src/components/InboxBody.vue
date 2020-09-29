@@ -1,147 +1,153 @@
 <template>
   <div class="inbox-body">
-      <div class="inbox-head">
-    <h3>Inbox</h3>
-    <form action="#" class="pull-right position">
-    <div class="input-append">
-        <input type="text" class="sr-input" placeholder="Search Mail" v-model="search" @keyup.enter="searchMails"/>
-        <button class="btn sr-btn" type="button"><i class="fa fa-search"></i></button>
-    </div>
-    </form>  
-</div>
+    <searchbar :mails="mails" @searching="search($event)"></searchbar>
     <div class="mail-option">
-        <div class="chk-all">
-            <input type="checkbox" class="mail-checkbox mail-group-checkbox">
-            <div class="btn-group">
-                <a data-toggle="dropdown" href="#" class="btn mini all" aria-expanded="false">
-                    All
-                    <i class="fa fa-angle-down "></i>
-                </a>
-                <ul class="dropdown-menu">
-                    <li><a href="#"> None</a></li>
-                    <li><a href="#"> Read</a></li>
-                    <li><a href="#"> Unread</a></li>
-                </ul>
-                </div>
-            </div>
+      <div class="chk-all">
+        <input type="checkbox" class="mail-checkbox mail-group-checkbox" />
+        <div class="btn-group">
+          <a
+            data-toggle="dropdown"
+            href="#"
+            class="btn mini all"
+            aria-expanded="false"
+          >
+            All
+            <i class="fa fa-angle-down"></i>
+          </a>
+          <ul class="dropdown-menu">
+            <li><a href="#"> None</a></li>
+            <li><a href="#"> Read</a></li>
+            <li><a href="#"> Unread</a></li>
+          </ul>
+        </div>
+      </div>
 
-            <div class="btn-group">
-                <a data-original-title="Refresh" data-placement="top" data-toggle="dropdown" href="#" class="btn mini tooltips">
-                    <i class=" fa fa-refresh"></i>
-                </a>
-            </div>
-                <div class="btn-group hidden-phone">
-                    <a data-toggle="dropdown" href="#" class="btn mini blue" aria-expanded="false">
-                         More
-                        <i class="fa fa-angle-down "></i>
-                    </a>
-                    <ul class="dropdown-menu">
-                        <li><a href="#"><i class="fa fa-pencil"></i> Mark as Read</a></li>
-                        <li><a href="#"><i class="fa fa-ban"></i> Spam</a></li>
-                        <li class="divider"></li>
-                        <li><a href="#"><i class="fa fa-trash-o"></i> Delete</a></li>
-                    </ul>
-                </div>
-                <div class="btn-group">
-                    <a data-toggle="dropdown" href="#" class="btn mini blue">
-                        Move to
-                        <i class="fa fa-angle-down "></i>
-                    </a>
-                    <ul class="dropdown-menu">
-                        <li><a href="#"><i class="fa fa-pencil"></i> Mark as Read</a></li>
-                        <li><a href="#"><i class="fa fa-ban"></i> Spam</a></li>
-                        <li class="divider"></li>
-                        <li><a href="#"><i class="fa fa-trash-o"></i> Delete</a></li>
-                    </ul>
-                </div>
-                    <ul class="unstyled inbox-pagination">
-                        <li><span class="btn btn-sm btn-outline-secondary" v-for="pageNumber in pages.slice(page-1, page)" :key="pageNumber"> {{ pageNumber }} - {{ page * perPage }}   of {{ mails.length }} </span></li>
-                        <li>
-                            <a class="btn btn-sm btn-outline-secondary" v-if="page != 1" @click="page--" ><i class="fa fa-angle-left  pagination-left"></i></a>
-                        </li>
-                          
-                        <li>
-                            <a class="btn btn-sm btn-outline-secondary" v-if="page < pages.length" @click="page++"><i class="fa fa-angle-right pagination-right"></i></a>
-                        </li>
-                    </ul>
-                </div>
-                <table class="table table-inbox table-hover">
-                    <tbody v-for="mail in filteredMails" :key="mail">
-
-                        <tr :class="{'unread': mail.readAt == null, 'read': mail.readAt != null}">
-                            <td class="inbox-small-cells">
-                                <input type="checkbox" class="mail-checkbox">
-                            </td>
-                            <td class="inbox-small-cells"><i class="fa fa-star"></i></td>
-                            <td class="view-message  dont-show">{{ mail.sender.name }}</td>
-                            <td class="view-message ">{{ mail.subject }}</td>
-                            <td class="view-message  inbox-small-cells"><i :class="{'fa fa-paperclip': mail.attachment == null}"></i></td>
-                            <td class="view-message  text-right">{{ mail.sentAt }}</td>
-                        </tr>
-                        
-                    </tbody>
-                </table>
+      <div class="btn-group">
+        <a
+          data-original-title="Refresh"
+          data-placement="top"
+          data-toggle="dropdown"
+          href="#"
+          class="btn mini tooltips"
+        >
+          <i class="fa fa-refresh"></i>
+        </a>
+      </div>
+      <div class="btn-group hidden-phone">
+        <a
+          data-toggle="dropdown"
+          href="#"
+          class="btn mini blue"
+          aria-expanded="false"
+        >
+          More
+          <i class="fa fa-angle-down"></i>
+        </a>
+        <ul class="dropdown-menu">
+          <li>
+            <a href="#"><i class="fa fa-pencil"></i> Mark as Read</a>
+          </li>
+          <li>
+            <a href="#"><i class="fa fa-ban"></i> Spam</a>
+          </li>
+          <li class="divider"></li>
+          <li>
+            <a href="#"><i class="fa fa-trash-o"></i> Delete</a>
+          </li>
+        </ul>
+      </div>
+      <div class="btn-group">
+        <a data-toggle="dropdown" href="#" class="btn mini blue">
+          Move to
+          <i class="fa fa-angle-down"></i>
+        </a>
+        <ul class="dropdown-menu">
+          <li>
+            <a href="#"><i class="fa fa-pencil"></i> Mark as Read</a>
+          </li>
+          <li>
+            <a href="#"><i class="fa fa-ban"></i> Spam</a>
+          </li>
+          <li class="divider"></li>
+          <li>
+            <a href="#"><i class="fa fa-trash-o"></i> Delete</a>
+          </li>
+        </ul>
+      </div>
+      <paginator :total="filteredMails.length" :per-page="perPage" @page="goto($event)"></paginator>
     </div>
+    <table class="table table-inbox table-hover">
+      <tbody v-for="mail in paginatedMails" :key="mail">
+        <tr :class="{ unread: mail.readAt == null, read: mail.readAt != null }">
+          <td class="inbox-small-cells">
+            <input type="checkbox" class="mail-checkbox" />
+          </td>
+          <td class="inbox-small-cells"><i class="fa fa-star"></i></td>
+          <td class="view-message dont-show">{{ mail.sender.name }}</td>
+          <td class="view-message">{{ mail.subject }}</td>
+          <td class="view-message inbox-small-cells">
+            <i :class="{ 'fa fa-paperclip': mail.attachment != null }"></i>
+          </td>
+          <td class="view-message text-right">{{ mail.sentAt }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 </template>
 
 <script>
-import axios from 'axios';
+import Paginator from './Paginator';
+import Searchbar from './Searchbar';
 
 export default {
-  data () {
+  name: 'InboxBody',
+  components: {
+    Paginator,
+    Searchbar,
+  },
+  props: {
+    mails: {
+      type: Array,
+      required: true,
+      default: function () {
+        return [];
+      },
+    },
+  },
+  data() {
     return {
-        mails: [],
-        page: 1,
-        perPage: 17,
-        pages: [],
-        search: '',
+      page: 1,
+      perPage: 20,
+      keyword: '',
+      filteredMails: [],
+    };
+  },
+  methods: {
+    paginate(mails) {
+      let from = this.page * this.perPage - this.perPage;
+      let to = this.page * this.perPage;
+      return mails.slice(from, to);
+    },
+    search(mails) {
+      this.filteredMails = mails
+    },
+    goto(page) {
+      this.page = page + 1;
+      console.log(this.page);
     }
- },
-    methods: {
-        getMails () {
-        axios.get('http://localhost:3000/mails')
-            .then(response => {
-                console.log(response)
-            this.mails = response.data;
-            })
-            .catch(error => {
-            console.log(error)
-            })
-        },
-        setPages () {
-        let numberOfPages = Math.ceil(this.mails.length / this.perPage);
-        for (let index = 1 ; index <= numberOfPages; index++) {
-            this.pages.push(index);
-        }
-        },
-        paginate (mails) {
-        let page = this.page;
-        let perPage = this.perPage;
-        let from = (page * perPage) - perPage;
-        let to = (page * perPage);
-        return  mails.slice(from, to);
-        },
+  },
+  watch: {
+    mails() {
+      this.filteredMails = this.mails;
     },
-    created () {
-        this.getMails();
-    },
-    watch: {
-        mails () {
-        this.setPages();
-        }
-    },
-    computed: {
-      filteredMails() {
-           if (this.search === ''){
-             return this.paginate(this.mails)
-           }
-           return this.mails.filter(mails => {
-          return mails.sender.name.toLowerCase().includes(this.search.toLowerCase())
-      })
-    },
+  },
+
+  computed: {
+    paginatedMails() {
+      return this.paginate(this.filteredMails);
     }
   }
-
+};
 </script>
 
 <style>

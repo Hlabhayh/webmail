@@ -5,10 +5,11 @@
     </a>
     <div class="user-name">
       <h5>
-        <a href="#">{{ profile.firstName +' '+ profile.lastName }}</a>
+        <a href="#" v-if="profile.firstName">{{ profile.firstName }} {{ profile.lastName }}</a>
+        <a href="#" v-if="!profile.firstName">Loading ...</a>
       </h5>
       <span>
-        <a href="#">{{ profile.email }}</a>
+        <a href="#" v-if="profile.email">{{ profile.email }}</a>
       </span>
     </div>
     <a class="mail-dropdown pull-right" href="javascript:;">
@@ -21,22 +22,23 @@
 import axios from 'axios';
 
 export default {
- name: 'Profile',
- data() {
+  name: 'Profile',
+  data() {
     return {
-      profile: [],
-      'fullWidthImage': true
+      profile: {},
+      fullWidthImage: true,
     } 
   },
   mounted () {
-        axios.get('http://localhost:3000/profile')
-        .then(response => {
-            this.profile = response.data
-        })
-        .catch(function (error) {
-            console.log(error)
-        })
-    }
+    axios.get('http://localhost:3000/profile')
+    .then(response => {
+      
+      this.profile = response.data;
+    })
+    .catch(function (error) {
+      console.error(error);
+    });
+  }
 };
 </script>
 

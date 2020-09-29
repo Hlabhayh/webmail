@@ -1,33 +1,46 @@
 <template>
   <div class="container" id="app">
+    <div class="mail-box">
+      <aside class="sm-side">
+        <profile></profile>
+        <side-navigation :mails="mails"></side-navigation>
+      </aside>
 
-        <div class="mail-box">
-
-            <aside class="sm-side">
-              <profile></profile>
-              <side-navigation></side-navigation>
-            </aside>
-
-            <aside class="lg-side">
-             <inbox-body></inbox-body>
-            </aside>
-
-        </div>
-
+      <aside class="lg-side">
+        <inbox-body :mails="mails"></inbox-body>
+      </aside>
     </div>
+  </div>
 </template>
 <script>
 
-import profile from './components/Profile'
-import InboxBody from './components/InboxBody'
-import SideNavigation from './components/SideNavigation'
+import Profile from './components/Profile';
+import InboxBody from './components/InboxBody';
+import SideNavigation from './components/SideNavigation';
+import axios from 'axios';
 
 export default {
+  name: 'App',
   components: {
     SideNavigation,
     InboxBody,
-    profile
-  }
+    Profile
+  },
+  data () {
+    return {
+      mails: [],
+    };
+  },
+  mounted() {
+    axios.get("http://localhost:3000/mails")
+    .then(response => {
+      this.mails = response.data;
+      console.log(this.mails, response);
+    })
+    .catch(error => {
+      console.error(error);
+    });
+  },
 }
 </script>
 
