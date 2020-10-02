@@ -1,6 +1,11 @@
 <template>
   <div class="inbox-body">
-    <searchbar :mails="mails" @searching="search($event)"></searchbar>
+    <searchbar 
+    :mails="mails" 
+    :currentView="currentView" 
+    @searching="search($event)"
+    >
+    </searchbar>
     <div class="mail-option">
       <div class="chk-all">
         <input type="checkbox" class="mail-checkbox mail-group-checkbox" />
@@ -74,7 +79,11 @@
           </li>
         </ul>
       </div>
-      <paginator :total="filteredMails.length" :per-page="perPage" @page="goto($event)"></paginator>
+      <paginator
+        :total="filteredMails.length"
+        :per-page="perPage"
+        @page="goto($event)"
+      ></paginator>
     </div>
     <table class="table table-inbox table-hover">
       <tbody v-for="mail in paginatedMails" :key="mail">
@@ -91,16 +100,17 @@
           <td class="view-message text-right">{{ mail.sentAt }}</td>
         </tr>
       </tbody>
+       <tbody v-if="filteredMails == !mails"> <h1> NOT FOUNDED ! </h1> </tbody>
     </table>
   </div>
 </template>
 
 <script>
-import Paginator from './Paginator';
-import Searchbar from './Searchbar';
+import Paginator from "./Paginator";
+import Searchbar from "./Searchbar";
 
 export default {
-  name: 'InboxBody',
+  name: "InboxBody",
   components: {
     Paginator,
     Searchbar,
@@ -113,13 +123,42 @@ export default {
         return [];
       },
     },
+    showReceivedMails: {
+      type: Array,
+      required: true,
+      default: function () {
+        return [];
+      },
+    },
+    showSentMails: {
+      type: Array,
+      required: true,
+      default: function () {
+        return [];
+      },
+    },
+    showImportantMails: {
+      type: Array,
+      required: true,
+      default: function () {
+        return [];
+      },
+    },
+    showTrashMails: {
+      type: Array,
+      required: true,
+      default: function () {
+        return [];
+      },
+    },
   },
   data() {
     return {
       page: 1,
       perPage: 20,
-      keyword: '',
+      keyword: "",
       filteredMails: [],
+      currentView: 'Inbox',
     };
   },
   methods: {
@@ -129,131 +168,127 @@ export default {
       return mails.slice(from, to);
     },
     search(mails) {
-      this.filteredMails = mails
+      this.filteredMails = mails;
     },
     goto(page) {
       this.page = page + 1;
-      console.log(this.page);
-    }
+    },
   },
   watch: {
     mails() {
-      this.filteredMails = this.mails;
+      this.filteredMails = this.mails.filter((mail) => {
+        return mail.sent == false && mail.deletedAt == null
+      });
+    },
+    showReceivedMails() {
+      this.filteredMails = this.showReceivedMails;
+      this.currentView = 'Inbox';
+    },
+    showSentMails() {
+      this.filteredMails = this.showSentMails;
+      this.currentView = 'Sent';
+    },
+    showImportantMails() {
+      this.filteredMails = this.showImportantMails;
+      this.currentView = 'Important';
+    },
+    showTrashMails() {
+      this.filteredMails = this.showTrashMails;
+      this.currentView = 'Trash';
     },
   },
-
   computed: {
     paginatedMails() {
       return this.paginate(this.filteredMails);
-    }
-  }
+    },
+  },
 };
 </script>
 
-<style>
-.inbox-body {
-  padding: 20px;
-}
-.inbox-head {
-  background: none repeat scroll 0 0 #41cac0;
-  border-radius: 0 4px 0 0;
-  color: #fff;
-  min-height: 80px;
-  padding: 20px;
-  margin-top: -20px;
-  margin-left: -20px;
-  margin-bottom: 10px;
-}
-.inbox-head h3 {
-  display: inline-block;
-  font-weight: 300;
-  margin: 0;
-  padding-top: 6px;
-}
-.inbox-head .sr-input {
-  border: medium none;
-  border-radius: 4px 0 0 4px;
-  box-shadow: none;
-  color: #8a8a8a;
-  float: left;
-  height: 40px;
-  padding: 0 10px;
-}
-.inbox-head .sr-btn {
-  background: none repeat scroll 0 0 #00a6b2;
-  border: medium none;
-  border-radius: 0 4px 4px 0;
-  color: #fff;
-  height: 40px;
-  padding: 0 20px;
-}
-.table-inbox {
-  border: 1px solid #d3d3d3;
-  margin-bottom: 0;
-}
-.table-inbox tr td {
-  padding: 12px !important;
-}
-.table-inbox tr td:hover {
-  cursor: pointer;
-}
-.table-inbox tr td .fa-star.inbox-started,
-.table-inbox tr td .fa-star:hover {
-  color: #f78a09;
-}
-.table-inbox tr td .fa-star {
-  color: #d5d5d5;
-}
-.table-inbox tr.unread td {
-  background: none repeat scroll 0 0 #f7f7f7;
-  font-weight: 600;
-}
-ul.inbox-pagination {
-  float: right;
-}
-ul.inbox-pagination li {
-  float: left;
-}
+<style lang="scss">
+$color_8: #f78a09;
+$color_9: #d5d5d5;
+$color_10: #afafaf;
+
 .mail-option {
   display: inline-block;
   margin-bottom: 10px;
   width: 100%;
+  .chk-all {
+    margin-right: 10px;
+    background: none repeat scroll 0 0 #fcfcfc;
+    border: 1px solid #e7e7e7;
+    border-radius: 3px !important;
+    color: $color_10;
+    display: inline-block;
+    padding: 5px 10px;
+    input[type="checkbox"] {
+      margin-top: 0;
+      margin-right: 10px;
+    }
+  }
+  .btn-group {
+    margin-right: 10px;
+    a.btn {
+      background: none repeat scroll 0 0 #fcfcfc;
+      border: 1px solid #e7e7e7;
+      border-radius: 3px !important;
+      color: $color_10;
+      display: inline-block;
+      padding: 5px 10px;
+    }
+    a.all {
+      border: medium none;
+      padding: 0;
+    }
+  }
 }
-.mail-option .chk-all,
-.mail-option .btn-group {
-  margin-right: 5px;
-  padding-left: 10px;
+.inbox-body {
+  padding: 20px;
+  .modal {
+    .modal-body {
+      input {
+        border: 1px solid #e6e6e6;
+        box-shadow: none;
+      }
+      textarea {
+        border: 1px solid #e6e6e6;
+        box-shadow: none;
+      }
+    }
+  }
 }
-.mail-option .chk-all,
-.mail-option .btn-group a.btn {
-  background: none repeat scroll 0 0 #fcfcfc;
-  border: 1px solid #e7e7e7;
-  border-radius: 3px !important;
-  color: #afafaf;
-  display: inline-block;
-  padding: 5px 10px;
-}
-.inbox-pagination a.np-btn {
-  background: none repeat scroll 0 0 #fcfcfc;
-  border: 1px solid #e7e7e7;
-  border-radius: 3px !important;
-  color: #afafaf;
-  display: inline-block;
-  padding: 5px 15px;
-}
-.mail-option .chk-all input[type="checkbox"] {
-  margin-top: 0;
-}
-.mail-option .btn-group a.all {
-  border: medium none;
-  padding: 1;
-}
-.inbox-pagination a.np-btn {
-  margin-left: 5px;
-}
-.inbox-pagination li span {
-  display: inline-block;
-  margin-right: 5px;
-  margin-top: 7px;
+.table-inbox {
+  border: 1px solid #d3d3d3;
+  margin-bottom: 0;
+  tr {
+    td {
+      padding: 12px !important;
+      &:hover {
+        cursor: pointer;
+      }
+      .fa-star.inbox-started {
+        color: $color_8;
+      }
+      .fa-star {
+        &:hover {
+          color: $color_8;
+        }
+        color: $color_9;
+      }
+    }
+  }
+  tr.unread {
+    td {
+      background: none repeat scroll 0 0 #f7f7f7;
+      font-weight: 600;
+    }
+  }
+  h1 {
+    text-align: center;
+    font-size: 2rem;
+    padding-bottom: 10px;
+    font-family:Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+  }
 }
 </style>
