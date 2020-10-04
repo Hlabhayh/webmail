@@ -102,21 +102,21 @@
     <ul class="inbox-nav inbox-divider">
       <li :class="{active: filter === 'inbox'}">
         <a href="#" @click.prevent="receivedMails"><i class="fa fa-inbox"></i> Inbox 
-        <span class="label label-success pull-right">{{ InboxCounter }}</span></a>
+        <span class="label label-success pull-right">{{ inboxCounter }}</span></a>
       </li>
       <li :class="{active: filter === 'sent'}">
         <a href="#" @click.prevent="sentMails"><i class="fa fa-envelope-o"></i> Sent Mail
-          <span class="label label-info pull-right">{{ SentCounter }}</span>
+          <span class="label label-info pull-right">{{ sentCounter }}</span>
         </a>
       </li>
       <li :class="{active: filter === 'important'}">
         <a href="#"  @click.prevent="importantMails"><i class="fa fa-bookmark-o"></i> Important
-          <span class="label label-default pull-right">{{ ImportantCounter }}</span>
+          <span class="label label-default pull-right">{{ importantCounter }}</span>
         </a>
       </li>
       <li :class="{active: filter === 'trash'}">
         <a href="#"  @click.prevent="trashMails"><i class="fa fa-trash-o"></i> Trash
-          <span class="label label-danger pull-right">{{ TrashCounter }}</span>
+          <span class="label label-danger pull-right">{{ trashCounter }}</span>
         </a>
       </li>
     </ul>
@@ -159,40 +159,75 @@ export default {
       type: String,
     },
   },
+  updated() {
+    switch (this.filter) {
+      case 'inbox':
+        this.receivedMails();
+        break;
+      case 'sent':
+        this.sentMails();
+        break;
+      case 'important':
+        this.importantMails();
+        break;
+      case 'trash':
+        this.trashMails();
+        break;
+    
+      default:
+        break;
+    }
+  },
   computed: {
-    InboxCounter() {
+    inbox() {
       return this.mails.filter((mail) => {
         return mail.sent === false && mail.deletedAt === null;
-        }).length
+      });
     },
-    SentCounter() {
+    sent() {
       return this.mails.filter((mail) => {
         return mail.sent === true && mail.deletedAt === null;
-        }).length
+      });
     },
-    TrashCounter() {
+    trash() {
       return this.mails.filter((mail) => {
         return mail.deletedAt !== null;
-        }).length
+      });
     },
-    ImportantCounter() {
+    important() {
       return this.mails.filter((mail) => {
-        return mail.important == true && mail.deletedAt === null;
-      }).length
+        return mail.important === true && mail.deletedAt === null;
+      });
+    },
+    inboxCounter() {
+      return this.inbox.length;
+    },
+    sentCounter() {
+      return this.sent.length;
+    },
+    trashCounter() {
+      return this.trash.length;
+    },
+    importantCounter() {
+      return this.important.length;
     },
   },
   methods: {
     receivedMails() {
-      this.$emit('received')
+      this.$emit('selected-filter', 'inbox'),
+      this.$emit('selected-mails', this.inbox);
     },
     sentMails() {
-      this.$emit('sent');
+      this.$emit('selected-filter', 'sent'),
+      this.$emit('selected-mails', this.sent);
     },
     importantMails() {
-      this.$emit('important');
+      this.$emit('selected-filter', 'important'),
+      this.$emit('selected-mails', this.important);
     },
     trashMails() {
-      this.$emit('trash');
+      this.$emit('selected-filter', 'trash'),
+      this.$emit('selected-mails', this.trash);
     },
   },
 };

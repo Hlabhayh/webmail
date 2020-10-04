@@ -6,23 +6,14 @@
         <side-navigation 
         :mails="mails"
         :filter="filter"
-        @sent="sentMails($event)"
-        @received="receivedMails($event)"
-        @important="importantMails($event)"
-        @trash="trashMails($event)"
+        @selected-filter="onSelectedFilter($event)"
+        @selected-mails="onSelectedMails($event)"
         >
         </side-navigation>
       </aside>
 
       <aside class="lg-side">
-        <inbox-body 
-        :mails="mails"
-        :showSentMails="showSentMails"
-        :showReceivedMails="showReceivedMails"
-        :showImportantMails="showImportantMails"
-        :showTrashMails="showTrashMails"
-        >
-        </inbox-body>
+        <inbox-body :mails="selectedMails" :title="title"></inbox-body>
       </aside>
     </div>
   </div>
@@ -43,10 +34,7 @@ export default {
   data() {
     return {
       mails: [],
-      showReceivedMails: [],
-      showSentMails: [],
-      showImportantMails: [],
-      showTrashMails: [],
+      selectedMails: [],
       filter: 'inbox',
     };
   },
@@ -61,29 +49,28 @@ export default {
       });
   },
   methods: {
-    receivedMails() {
-      this.showReceivedMails = this.mails.filter(mail => {
-        return mail.sent === false && mail.deletedAt === null;
-      });
-      this.filter = 'inbox';
+    onSelectedMails(mails) {
+      this.selectedMails = mails;
     },
-    sentMails() {
-      this.showSentMails = this.mails.filter(mail => {
-        return mail.sent === true && mail.deletedAt === null;
-      });
-      this.filter = 'sent';
+    onSelectedFilter(filter) {
+      this.filter = filter;
     },
-    importantMails() {
-      this.showImportantMails = this.mails.filter(mail => {
-        return mail.important === true && mail.deletedAt === null;
-      });
-      this.filter = 'important';
-    },
-    trashMails() {
-      this.showTrashMails = this.mails.filter(mail => {
-        return mail.deletedAt !== null;
-      });
-      this.filter = 'trash';
+  },
+  computed: {
+    title() {
+      switch (this.filter) {
+        case 'inbox':
+          return 'Inbox';
+        case 'sent':
+          return 'Sent Mail';
+        case 'important':
+          return 'Important';
+        case 'trash':
+          return 'Trash';
+     
+        default:
+          return '';
+      }
     },
   },
 };

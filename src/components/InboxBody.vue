@@ -2,7 +2,7 @@
   <div class="inbox-body">
     <searchbar 
     :mails="mails" 
-    :currentView="currentView" 
+    :title="title" 
     @searching="search($event)"
     >
     </searchbar>
@@ -123,32 +123,11 @@ export default {
         return [];
       },
     },
-    showReceivedMails: {
-      type: Array,
+    title: {
+      type: String,
       required: true,
       default: function () {
-        return [];
-      },
-    },
-    showSentMails: {
-      type: Array,
-      required: true,
-      default: function () {
-        return [];
-      },
-    },
-    showImportantMails: {
-      type: Array,
-      required: true,
-      default: function () {
-        return [];
-      },
-    },
-    showTrashMails: {
-      type: Array,
-      required: true,
-      default: function () {
-        return [];
+        return '';
       },
     },
   },
@@ -158,7 +137,6 @@ export default {
       perPage: 20,
       keyword: "",
       filteredMails: [],
-      currentView: 'Inbox',
     };
   },
   methods: {
@@ -176,25 +154,7 @@ export default {
   },
   watch: {
     mails() {
-      this.filteredMails = this.mails.filter((mail) => {
-        return mail.sent == false && mail.deletedAt == null
-      });
-    },
-    showReceivedMails() {
-      this.filteredMails = this.showReceivedMails;
-      this.currentView = 'Inbox';
-    },
-    showSentMails() {
-      this.filteredMails = this.showSentMails;
-      this.currentView = 'Sent';
-    },
-    showImportantMails() {
-      this.filteredMails = this.showImportantMails;
-      this.currentView = 'Important';
-    },
-    showTrashMails() {
-      this.filteredMails = this.showTrashMails;
-      this.currentView = 'Trash';
+      this.filteredMails = this.mails;
     },
   },
   computed: {
