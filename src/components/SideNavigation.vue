@@ -100,26 +100,24 @@
       <!-- /.modal -->
     </div>
     <ul class="inbox-nav inbox-divider">
-      <li class="active">
-        <a href="#"
-          ><i class="fa fa-inbox"></i> Inbox
-          <span class="label label-danger pull-right">{{ counter }}</span></a
-        >
+      <li :class="{active: filter === 'inbox'}">
+        <a href="#" @click.prevent="receivedMails"><i class="fa fa-inbox"></i> Inbox 
+        <span class="label label-success pull-right">{{ InboxCounter }}</span></a>
       </li>
-      <li>
-        <a href="#"><i class="fa fa-envelope-o"></i> Sent Mail</a>
+      <li :class="{active: filter === 'sent'}">
+        <a href="#" @click.prevent="sentMails"><i class="fa fa-envelope-o"></i> Sent Mail
+          <span class="label label-info pull-right">{{ SentCounter }}</span>
+        </a>
       </li>
-      <li>
-        <a href="#"><i class="fa fa-bookmark-o"></i> Important</a>
+      <li :class="{active: filter === 'important'}">
+        <a href="#"  @click.prevent="importantMails"><i class="fa fa-bookmark-o"></i> Important
+          <span class="label label-default pull-right">{{ ImportantCounter }}</span>
+        </a>
       </li>
-      <li>
-        <a href="#"
-          ><i class="fa fa-external-link"></i> Drafts
-          <span class="label label-info pull-right">30</span></a
-        >
-      </li>
-      <li>
-        <a href="#"><i class="fa fa-trash-o"></i> Trash</a>
+      <li :class="{active: filter === 'trash'}">
+        <a href="#"  @click.prevent="trashMails"><i class="fa fa-trash-o"></i> Trash
+          <span class="label label-danger pull-right">{{ TrashCounter }}</span>
+        </a>
       </li>
     </ul>
     <ul class="nav nav-pills nav-stacked labels-info inbox-divider">
@@ -157,296 +155,174 @@ export default {
         return [];
       },
     },
+    filter: {
+      type: String,
+    },
   },
   computed: {
-    counter() {
-      console.log(this.mails);
-      return this.mails.length;
+    InboxCounter() {
+      return this.mails.filter((mail) => {
+        return mail.sent === false && mail.deletedAt === null;
+        }).length
+    },
+    SentCounter() {
+      return this.mails.filter((mail) => {
+        return mail.sent === true && mail.deletedAt === null;
+        }).length
+    },
+    TrashCounter() {
+      return this.mails.filter((mail) => {
+        return mail.deletedAt !== null;
+        }).length
+    },
+    ImportantCounter() {
+      return this.mails.filter((mail) => {
+        return mail.important == true && mail.deletedAt === null;
+      }).length
+    },
+  },
+  methods: {
+    receivedMails() {
+      this.$emit('received')
+    },
+    sentMails() {
+      this.$emit('sent');
+    },
+    importantMails() {
+      this.$emit('important');
+    },
+    trashMails() {
+      this.$emit('trash');
     },
   },
 };
 </script>
 
-<style>
-.inbox-body {
-  padding: 20px;
-}
-.btn-compose {
-  background: none repeat scroll 0 0 #ff6c60;
-  color: #fff;
-  padding: 12px 0;
-  text-align: center;
-  width: 100%;
-}
-.btn-compose:hover {
-  background: none repeat scroll 0 0 #f5675c;
-  color: #fff;
-}
+<style lang="scss">
+$color_1: #fff;
+$color_4: #6a6a6a;
+$color_5: #5c5c5e;
+$color_6: #9d9f9e;
+$font_family_1: "Open Sans", sans-serif;
+
 ul.inbox-nav {
   display: inline-block;
   margin: 0;
   padding: 0;
   width: 100%;
+  li {
+    display: inline-block;
+    line-height: 45px;
+    width: 100%;
+    a {
+      color: $color_4;
+      display: inline-block;
+      line-height: 45px;
+      padding: 0 20px;
+      width: 100%;
+      &:hover {
+        background: none repeat scroll 0 0 #d5d7de;
+        color: $color_4;
+      }
+      &:focus {
+        background: none repeat scroll 0 0 #d5d7de;
+        color: $color_4;
+      }
+      i {
+        color: $color_4;
+        font-size: 16px;
+        padding-right: 10px;
+      }
+      span.label {
+        margin-top: 13px;
+      }
+    }
+  }
+  li.active {
+    a {
+      background: none repeat scroll 0 0 #d5d7de;
+      color: $color_4;
+    }
+  }
 }
 .inbox-divider {
   border-bottom: 1px solid #d5d8df;
 }
-ul.inbox-nav li {
-  display: inline-block;
-  line-height: 45px;
-  width: 100%;
+
+ul.labels-info {
+  li {
+    h4 {
+      color: $color_5;
+      font-size: 13px;
+      padding-left: 15px;
+      padding-right: 15px;
+      padding-top: 5px;
+      text-transform: uppercase;
+    }
+    margin: 0;
+    a {
+      border-radius: 0;
+      color: $color_4;
+      &:hover {
+        background: none repeat scroll 0 0 #d5d7de;
+        color: $color_4;
+      }
+      &:focus {
+        background: none repeat scroll 0 0 #d5d7de;
+        color: $color_4;
+      }
+      i {
+        padding-right: 10px;
+      }
+    }
+  }
 }
-ul.inbox-nav li a {
-  color: #6a6a6a;
-  display: inline-block;
-  line-height: 45px;
-  padding: 0 20px;
-  width: 100%;
-}
-ul.inbox-nav li a:hover,
-ul.inbox-nav li.active a,
-ul.inbox-nav li a:focus {
-  background: none repeat scroll 0 0 #d5d7de;
-  color: #6a6a6a;
-}
-ul.inbox-nav li a i {
-  color: #6a6a6a;
-  font-size: 16px;
-  padding-right: 10px;
-}
-ul.inbox-nav li a span.label {
-  margin-top: 13px;
-}
-ul.labels-info li h4 {
-  color: #5c5c5e;
-  font-size: 13px;
-  padding-left: 15px;
-  padding-right: 15px;
-  padding-top: 5px;
-  text-transform: uppercase;
-}
-ul.labels-info li {
-  margin: 0;
-}
-ul.labels-info li a {
-  border-radius: 0;
-  color: #6a6a6a;
-}
-ul.labels-info li a:hover,
-ul.labels-info li a:focus {
-  background: none repeat scroll 0 0 #d5d7de;
-  color: #6a6a6a;
-}
-ul.labels-info li a i {
-  padding-right: 10px;
-}
-.nav.nav-pills.nav-stacked.labels-info p {
-  color: #9d9f9e;
-  font-size: 11px;
-  margin-bottom: 0;
-  padding: 0 22px;
-}
-.table-inbox {
-  border: 1px solid #d3d3d3;
-  margin-bottom: 0;
-}
-.table-inbox tr td {
-  padding: 12px !important;
-}
-.table-inbox tr td:hover {
-  cursor: pointer;
-}
-.table-inbox tr td .fa-star.inbox-started,
-.table-inbox tr td .fa-star:hover {
-  color: #f78a09;
-}
-.table-inbox tr td .fa-star {
-  color: #d5d5d5;
-}
-.table-inbox tr.unread td {
-  background: none repeat scroll 0 0 #f7f7f7;
-  font-weight: 600;
-}
-ul.inbox-pagination {
-  float: right;
-}
-ul.inbox-pagination li {
-  float: left;
-}
-.mail-option {
-  display: inline-block;
-  margin-bottom: 10px;
-  width: 100%;
-}
-.mail-option .chk-all,
-.mail-option .btn-group {
-  margin-right: 5px;
-}
-.mail-option .chk-all,
-.mail-option .btn-group a.btn {
-  background: none repeat scroll 0 0 #fcfcfc;
-  border: 1px solid #e7e7e7;
-  border-radius: 3px !important;
-  color: #afafaf;
-  display: inline-block;
-  padding: 5px 10px;
-}
-.inbox-pagination a.np-btn {
-  background: none repeat scroll 0 0 #fcfcfc;
-  border: 1px solid #e7e7e7;
-  border-radius: 3px !important;
-  color: #afafaf;
-  display: inline-block;
-  padding: 5px 15px;
-}
-.mail-option .chk-all input[type="checkbox"] {
-  margin-top: 0;
-}
-.mail-option .btn-group a.all {
-  border: medium none;
-  padding: 0;
-}
-.inbox-pagination a.np-btn {
-  margin-left: 5px;
-}
-.inbox-pagination li span {
-  display: inline-block;
-  margin-right: 5px;
-  margin-top: 7px;
+.nav.nav-pills.nav-stacked.labels-info {
+  p {
+    color: $color_6;
+    font-size: 11px;
+    margin-bottom: 0;
+    padding: 0 22px;
+  }
 }
 .fileinput-button {
   background: none repeat scroll 0 0 #eeeeee;
   border: 1px solid #e6e6e6;
-}
-.inbox-body .modal .modal-body input,
-.inbox-body .modal .modal-body textarea {
-  border: 1px solid #e6e6e6;
-  box-shadow: none;
-}
-.btn-send,
-.btn-send:hover {
-  background: none repeat scroll 0 0 #00a8b3;
-  color: #fff;
-}
-.btn-send:hover {
-  background: none repeat scroll 0 0 #009da7;
-}
-.modal-header h4.modal-title {
-  font-family: "Open Sans", sans-serif;
-  font-weight: 300;
-}
-.modal-body label {
-  font-family: "Open Sans", sans-serif;
-  font-weight: 400;
-}
-.heading-inbox h4 {
-  border-bottom: 1px solid #ddd;
-  color: #444;
-  font-size: 18px;
-  margin-top: 20px;
-  padding-bottom: 10px;
-}
-.sender-info {
-  margin-bottom: 20px;
-}
-.sender-info img {
-  height: 30px;
-  width: 30px;
-}
-.sender-dropdown {
-  background: none repeat scroll 0 0 #eaeaea;
-  color: #777;
-  font-size: 10px;
-  padding: 0 3px;
-}
-.view-mail a {
-  color: #ff6c60;
-}
-.attachment-mail {
-  margin-top: 30px;
-}
-.attachment-mail ul {
-  display: inline-block;
-  margin-bottom: 30px;
-  width: 100%;
-}
-.attachment-mail ul li {
-  float: left;
-  margin-bottom: 10px;
-  margin-right: 10px;
-  width: 150px;
-}
-.attachment-mail ul li img {
-  width: 100%;
-}
-.attachment-mail ul li span {
-  float: right;
-}
-.attachment-mail .file-name {
-  float: left;
-}
-.attachment-mail .links {
-  display: inline-block;
-  width: 100%;
-}
-
-.fileinput-button {
   float: left;
   margin-right: 4px;
   overflow: hidden;
   position: relative;
-}
-.fileinput-button input {
-  cursor: pointer;
-  direction: ltr;
-  font-size: 23px;
-  margin: 0;
-  opacity: 0;
-  position: absolute;
-  right: 0;
-  top: 0;
-  transform: translate(-300px, 0px) scale(4);
-}
-.fileupload-buttonbar .btn,
-.fileupload-buttonbar .toggle {
-  margin-bottom: 5px;
-}
-.files .progress {
-  width: 200px;
-}
-.fileupload-processing .fileupload-loading {
-  display: block;
-}
-* html .fileinput-button {
-  line-height: 24px;
-  margin: 1px -3px 0 0;
-}
-* + html .fileinput-button {
-  margin: 1px 0 0;
-  padding: 2px 15px;
-}
-@media (max-width: 767px) {
-  .files .btn span {
-    display: none;
-  }
-  .files .preview * {
-    width: 40px;
-  }
-  .files .name * {
-    display: inline-block;
-    width: 80px;
-    word-wrap: break-word;
-  }
-  .files .progress {
-    width: 20px;
-  }
-  .files .delete {
-    width: 60px;
+  input {
+    cursor: pointer;
+    direction: ltr;
+    font-size: 23px;
+    margin: 0;
+    opacity: 0;
+    position: absolute;
+    right: 0;
+    top: 0;
+    transform: translate(-300px, 0px) scale(4);
   }
 }
-ul {
-  list-style-type: none;
-  padding: 0px;
-  margin: 0px;
+.btn-send {
+  background: none repeat scroll 0 0 #00a8b3;
+  color: $color_1;
+  &:hover {
+    background: none repeat scroll 0 0 #00a8b3;
+    color: $color_1;
+    background: none repeat scroll 0 0 #009da7;
+  }
+}
+.modal-header {
+  h4.modal-title {
+    font-family: $font_family_1;
+    font-weight: 300;
+  }
+}
+.modal-body {
+  label {
+    font-family: $font_family_1;
+    font-weight: 400;
+  }
 }
 </style>
