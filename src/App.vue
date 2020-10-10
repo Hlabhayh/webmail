@@ -22,7 +22,7 @@
 import Profile from "./components/Profile";
 import InboxBody from "./components/InboxBody";
 import SideNavigation from "./components/SideNavigation";
-import axios from "axios";
+import { mapGetters, mapState } from 'vuex';
 
 export default {
   name: "App",
@@ -31,47 +31,21 @@ export default {
     InboxBody,
     Profile,
   },
-  data() {
-    return {
-      mails: [],
-      selectedMails: [],
-      filter: 'inbox',
-    };
-  },
   mounted() {
-    axios
-      .get("http://localhost:3000/mails")
-      .then((response) => {
-        this.mails = response.data;
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+    this.$store.dispatch('getMails');
   },
   methods: {
     onSelectedMails(mails) {
-      this.selectedMails = mails;
+      this.$store.commit('onSelectedMails', mails);
     },
     onSelectedFilter(filter) {
-      this.filter = filter;
+      this.$store.commit('onSelectedFilter', filter);
     },
   },
+
   computed: {
-    title() {
-      switch (this.filter) {
-        case 'inbox':
-          return 'Inbox';
-        case 'sent':
-          return 'Sent Mail';
-        case 'important':
-          return 'Important';
-        case 'trash':
-          return 'Trash';
-     
-        default:
-          return '';
-      }
-    },
+    ...mapState(['mails', 'selectedMails', 'filter']),
+    ...mapGetters(['title']),
   },
 };
 </script>
