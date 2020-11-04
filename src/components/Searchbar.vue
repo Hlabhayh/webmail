@@ -1,32 +1,32 @@
 <template>
-  <div class="inbox-head">
-    <h3>{{ title }}</h3>
-    <form class="pull-right position" @submit="search($event)">
-      <div class="input-append">
-        <input
-          type="text"
-          class="sr-input"
-          placeholder="Search Mail"
-          v-model="keyword"
-        />
-        <button class="btn sr-btn" type="submit">
-          <i class="fa fa-search"></i>
-        </button>
-      </div>
-    </form>
-  </div>
+<div class="inbox-head">
+      <h3>{{ title }}</h3>
+      <form class="pull-right position" @submit="search($event)">
+        <div class="input-append">
+          <input
+            type="text"
+            class="sr-input"
+            placeholder="Search Mail"
+            v-model="keyword"
+          />
+          <button class="btn sr-btn" type="submit">
+            <i class="fa fa-search"></i>
+          </button>
+        </div>
+      </form>
+    </div>
 </template>
 
 <script>
 export default {
-  name: "Searchbox",
+  name: 'Searchbar',
   props: {
     mails: {
       type: Array,
       required: true,
-      default: () => {
+      default: function () {
         return [];
-      },
+      }, 
     },
     title: {
       type: String,
@@ -34,15 +34,15 @@ export default {
   },
   data() {
     return {
-      keyword: "",
-      filteredMails: [],
+      keyword: '',
+      foundedMails: [],
     };
   },
   methods: {
-    search(event) {
-      event.preventDefault();
+    search(e) {
+      e.preventDefault()
       this.foundedMails = this.mails.filter((mail) => {
-        if(mail.deletedAt == null) {
+        if(mail.deletedAt === null || mail.deletedAt !== null) {
           return mail.sender.name
           .toLowerCase()
           .includes(this.keyword.toLowerCase())

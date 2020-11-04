@@ -26,7 +26,7 @@ export default {
   data() {
     return {
       profile: {},
-    }; 
+    } 
   },
   mounted () {
     axios.get('http://localhost:3000/profile')

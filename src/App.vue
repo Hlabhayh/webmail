@@ -3,29 +3,29 @@
     <div class="mail-box">
       <aside class="sm-side">
         <profile></profile>
-        <side-navigation 
-        :mails="mails"
-        :filter="filter"
-        @selected-filter="onSelectedFilter($event)"
-        @selected-mails="onSelectedMails($event)"
-        >
-        </side-navigation>
+          <side-navigation 
+            :mails="mails"
+            :filter="filter"
+            @selected-mails="onSelectedMails($event)"
+            @selected-filter="onSelectedFilter($event)"
+            >
+          </side-navigation>
       </aside>
 
       <aside class="lg-side">
-        <inbox-body :mails="selectedMails" :title="title"></inbox-body>
+        <inbox-body :mails="selectedMails" :title="title">
+        </inbox-body>
       </aside>
     </div>
   </div>
 </template>
 <script>
-import Profile from "./components/Profile";
-import InboxBody from "./components/InboxBody";
-import SideNavigation from "./components/SideNavigation";
+import Profile from './components/Profile';
+import InboxBody from './components/InboxBody';
+import SideNavigation from './components/SideNavigation';
 import { mapGetters, mapState } from 'vuex';
-
 export default {
-  name: "App",
+  name: 'App',
   components: {
     SideNavigation,
     InboxBody,
@@ -35,16 +35,15 @@ export default {
     this.$store.dispatch('getMails');
   },
   methods: {
-    onSelectedMails(mails) {
-      this.$store.commit('onSelectedMails', mails);
+    onSelectedMails(mail) {
+      this.$store.commit('theSelectedMails', mail);
     },
     onSelectedFilter(filter) {
-      this.$store.commit('onSelectedFilter', filter);
+      this.$store.commit('theSelectedFilter', filter);
     },
   },
-
   computed: {
-    ...mapState(['mails', 'selectedMails', 'filter']),
+    ...mapState(['mails','selectedMails', 'filter']),
     ...mapGetters(['title']),
   },
 };

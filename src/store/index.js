@@ -1,9 +1,10 @@
 import { createStore } from 'vuex'
-import axios from "axios";
+import axios from 'axios';
+import randomMessages from '../data/randome-messages';
 
 export default createStore({
   state: {
-    mails: [],
+    mails :[],
     selectedMails: [],
     filter: 'inbox',
     message: {
@@ -23,16 +24,18 @@ export default createStore({
       "readAt": null,
       "deletedAt": null,
     },
+    checked: [],
+    allSelected: false,
   },
   mutations: {
     mails(state, data) {
-      state.mails = data
+      state.mails = data;
     },
-    onSelectedMails(state, mails) {
-      state.selectedMails = mails.sort((a, b) => 
+    theSelectedMails(state, mail) {
+      state.selectedMails = mail.sort((a, b) => 
       a.sentAt < b.sentAt ? 1 : -1);
     },
-    onSelectedFilter(state, filter) {
+    theSelectedFilter(state, filter) {
       state.filter = filter;
     },
   },
@@ -47,10 +50,14 @@ export default createStore({
           return 'Important';
         case 'trash':
           return 'Trash';
-     
         default:
           return '';
       }
+    },
+    refresh(state){
+      let randomIndex = Math.floor(Math.random() * randomMessages.length);
+      let temp = [randomMessages[randomIndex]];
+      state.mails = temp.concat(state.mails.slice(0));
     },
     sendMessage(state) {
       axios.post('http://localhost:3000/mails', state.message)
@@ -61,18 +68,52 @@ export default createStore({
       }
       .bind(state)
     )},
+    showAll(state) {
+      state.selectedMails = state.mails;
+    },
+    showRead(state) {
+      state.selectedMails = state.mails.filter(mail => {return mail.readAt !== null })
+    },
+    showUnread(state) {
+      state.selectedMails = state.mails.filter(mail => {return mail.readAt === null })
+    },
+    selectAll(state){ 
+      state.allSelected = !state.allSelected; 
+      state.checked = [];
+      if(state.allSelected){
+        state.checked = state.selectedMails.map(m => m.id);
+      }
+    },
+    markAsRead(state) {
+      state.checked.map(mail => { 
+        mail.readAt = new Date();
+      })
+    },
+    remove(state) {
+      state.checked.map((mail) => {
+          mail.deletedAt = new Date();
+      })
+     },
   },
   actions: {
     getMails(context) {
-      axios
-      .get("http://localhost:3000/mails")
-      .then((response) => {
+      axios.get("http://localhost:3000/mails")
+      .then(response => {
         context.commit('mails', response.data);
       })
-      .catch((error) => {
+      .catch(error => {
         console.error(error);
       });
     },
+    deleteMail(context, mail) {
+      axios.put("http://localhost:3000/mails/" + mail.id, mail)
+      .then(() => {
+        context.commit('deletedMail', mail)
+      })
+      .catch(error => {
+        console.error(error);
+      })
+    }
   },
   modules: {
   }
