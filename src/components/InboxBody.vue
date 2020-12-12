@@ -1,54 +1,53 @@
 <template>
   <div class="inbox-body" >
-    <searchbar :mails="mails" :title="title" @searching="search($event)"></searchbar>
+    <searchbar></searchbar>
     <div class="mail-option">
       <div class="chk-all">
-        <input type="checkbox" class="mail-checkbox mail-group-checkbox" @click="selectAll" v-model="$store.state.allSelected"/>
+        <input type="checkbox" class="mail-checkbox mail-group-checkbox" @click="onCheckAll" v-model="isChecked" />
         <div class="btn-group" >
-          <a data-toggle="dropdown" class="btn mini all" onclick="document.getElementById('box1').style.display = 'block'">
-            All
+          <a data-toggle="dropdown" class="btn mini all"> All
             <i class="fa fa-angle-down"></i>
           </a>
-          <div id="box1" v-show="show">
+          <div id="box1" >
             <ul class="dropdown-menu">
-              <li><a href="#" @click="showAll"> None</a></li>
-              <li><a href="#" @click="showRead"> Read</a></li>
-              <li><a href="#" @click="showUnread"> Unread</a></li>
+              <li><a  @click.prevent="onCheckNone"  style="cursor: pointer;"> None</a></li>
+              <li><a  @click.prevent="onCheckRead" style="cursor: pointer;"> Read</a></li>
+              <li><a  @click.prevent="onCheckUnread" style="cursor: pointer;"> Unread</a></li>
             </ul>
           </div>
         </div>
       </div>
       <div class="btn-group">
-        <a data-original-title="Refresh" data-placement="top" data-toggle="dropdown" href="/public/index.html" class="btn mini tooltips" @click.prevent.stop="refresh">
+        <a data-original-title="Refresh" data-placement="top" data-toggle="dropdown" href="/public/index.html" class="btn mini tooltips">
           <i class="fa fa-refresh"></i>
         </a>
       </div>
       <div class="btn-group hidden-phone">
-        <a data-toggle="dropdown" class="btn mini blue" onclick="document.getElementById('box2').style.display = 'block'">
+        <a data-toggle="dropdown" class="btn mini blue">
           More
           <i class="fa fa-angle-down"></i>
         </a>
-        <div id="box2"  v-show="show">
+        <div id="box2">
           <ul class="dropdown-menu">
             <li>
-              <a href="#" @click="markAsRead"><i class="fa fa-pencil"></i> Mark as Read</a>
+              <a @click.prevent="onMarkAsRead" style="cursor: pointer;"><i class="fa fa-pencil"></i> Mark as Read</a>
             </li>
             <li>
-              <a href="#"><i class="fa fa-ban"></i> Spam</a>
+              <a href="#" style="cursor: pointer;"><i class="fa fa-ban"></i> Spam</a>
             </li>
             <li class="divider"></li>
             <li>
-              <a href="#" @click="remove"><i class="fa fa-trash-o"></i> Delete</a>
+              <a  @click.prevent="onMoveToTrash" style="cursor: pointer;"><i class="fa fa-trash-o" ></i> Delete</a>
             </li>
           </ul>
         </div>
       </div>
       <div class="btn-group">
-        <a data-toggle="dropdown" class="btn mini blue" onclick="document.getElementById('box3').style.display = 'block'">
+        <a data-toggle="dropdown" class="btn mini blue">
           Move to
           <i class="fa fa-angle-down"></i>
         </a>
-        <div id="box3" v-show="show">
+        <div id="box3">
         <ul class="dropdown-menu">
           <li>
             <a href="#"><i class="fa fa-pencil"></i> Mark as Read</a>
@@ -58,51 +57,54 @@
           </li>
           <li class="divider"></li>
           <li>
-            <a href="#" @click="fullRemove"><i class="fa fa-trash-o"></i> Delete</a>
+            <a href="#"><i class="fa fa-trash-o"></i> Delete</a>
           </li>
         </ul>
         </div>
       </div>
-      <paginator :total="filteredMails.length" :per-page="perPage" @page="goto($event)" ></paginator>
+      <paginator :total="mails.length" :per-page="perPage" @page="goto($event)" ></paginator>
     </div>
-    <table class="table table-inbox table-hover">
-      <tbody v-show="!viewMessage" v-for="mail in paginatedMails" :key="mail">   
-        <tr :class="{ unread: mail.readAt === null, read: mail.readAt !== null }">
+    <table class="table table-inbox table-hover" v-if="!mail">
+      <tbody v-for="m in paginatedMails" :key="m.id">   
+        <tr :class="{ unread: !m.readAt, read: m.readAt}">
           <td class="inbox-small-cells">
-            <input type="checkbox" class="mail-checkbox" v-model="$store.state.checked" :value="mail.id"/>
+            <input type="checkbox" class="mail-checkbox" @change.prevent="onCheckMail" :value="m"  v-model="checked" :checked="selected[m.id]"/>
           </td>
           <td class="inbox-small-cells">
-            <a href="#" v-if="typeof mail.important !== true" @click.prevent.stop="mail.important = !mail.important">
-              <i :class="['fa', 'fa-star', { 'inbox-started': mail.important }]"></i></a>
+            <a href="#">
+              <i class="fa fa-star" :class="{'inbox-started': m.important }" @click.prevent="OnImportant(m)"  :value="m.id"></i>
+            </a>
           </td>
-          <td class="view-message dont-show">{{ mail.sender.name }}</td>
-          <td class="view-message"  @click="showMessage(mail)">{{ mail.subject }}</td>
+          <td class="view-message dont-show">{{ m.sender.name }}</td>
+          <td class="view-message"  @click="onSelectMail(m)">{{ m.subject }}</td>
           <td class="view-message inbox-small-cells">
-            <i :class="{ 'fa fa-paperclip': mail.attachment !== null }"></i>
+            <i v-if="m.attachment" class="fa fa-paperclip"></i>
           </td>
-          <td class="view-message text-right">{{ mail.sentAt }}</td>
+          <td class="view-message text-right">{{ m.sentAt }}</td>
         </tr>
       </tbody>
-      <tbody v-if="filteredMails == !mails && filteredMails != !viewMessage">
-        <h1>NOT FOUND</h1>
-      </tbody>
-      <tbody v-if="viewMessage" >
-        <div class="message-box" v-for="message in messages" :key="message">
+    </table>
+    <table class="table table-inbox table-hover" v-if="mail">
+      <tbody>
+        <div class="message-box">
           <div class="message-options">
-            <button class="btn btn-primary" @click="navigateBack">
+            <button class="btn btn-primary" @click="navigateBack(mail)">
               <i class="fa fa-arrow-left" aria-hidden="true"></i> Back
             </button>
-            <button class="btn btn-danger" @click="deleteMessage">
+            <button class="btn btn-success" @click="MarkAsUnread(mail)">
+              <span class="glyphicon glyphicon-envelope"></span> mark as unread
+            </button>
+            <button class="btn btn-danger" @click="deleteMail(mail)">
               <span class="btn-label"><i class="glyphicon glyphicon-trash"></i></span> Delete
             </button>
           </div>
-          <p><strong>From: </strong>{{ message.sentAt }}</p>
-          <p><strong>Date: </strong>{{ message.sender.name }}</p>        
-          <p><strong>Message :</strong>{{ message.content }}</p>
+          <p><strong>From: </strong>{{ mail.sentAt }}</p>
+          <p><strong>Date: </strong>{{ mail.sender.name }}</p>        
+          <p><strong>Message :</strong>{{ mail.content }}</p>
           <hr>
           <div class="message"></div>
           <div>
-            <h4>{{ message.attachment }}</h4>
+            <h4>{{ mail.attachment }}</h4>
             <ul>
             </ul>
           </div>
@@ -117,16 +119,8 @@
 import {  mapGetters, mapState } from 'vuex';
 import Paginator from './Paginator';
 import Searchbar from './Searchbar';
-
-var boxes = ['box1', 'box2', 'box3'];
-  window.addEventListener('mouseup', (e) => {
-    for(var i=0; i < boxes.length; i++) {
-      var box = document.getElementById(boxes[i]);
-      if(e.target != box && e.target.parentNode != box) {
-        box.style.display = 'none';
-      }
-    }
-  });
+import * as Mutations from '../store/mutation-types';
+import * as Actions from '../store/action-types';
 
 export default {
   name: 'InboxBody',
@@ -134,50 +128,70 @@ export default {
     Paginator,
     Searchbar,
   },
-  props: {
-    mails: {
-      type: Array,
-      required: true,
-      default: function () {
-        return [];
-      },
-    },
-    title: {
-      type: String,
-    },
-  },
   data() {
     return {
       page: 1,
       perPage: 20,
-      filteredMails: [],
-      show: false,
-      viewMessage: false,
-      messages: [],
-
+      checked: [],
+      isChecked: false,
     };
   },
   methods: {
-    ...mapGetters(['showAll','showRead','showUnread','markAsRead','selectAll','markAsRead','remove','refresh']),
-
-    showMessage(mail) {
-      this.messages.push(mail);
-      this.filteredMails = this.messages; 
-      this.messages.map(mail => { return mail.readAt = new Date()});
-      this.viewMessage = true;
+    OnImportant(m) {
+      this.$store.dispatch(Actions.ON_IMPORTANT, m)
     },
-    navigateBack() {
-      this.filteredMails = this.mails;
-      this.messages = [];
-      this.viewMessage = false;
+    onCheckNone() {
+      this.checked = [];
+      this.isChecked = false;
+      this.$store.commit(Mutations.MAIL_UNCHECK_ALL);
     },
-    deleteMessage() {
-      alert('are you sure you want to delete this mail !');
-      this.viewMessage = false;
-      this.messages.map(mail => { return mail.deletedAt = new Date()});
-      this.filteredMails = this.mails;
-      this.messages = [];
-      this.$store.dispatch('deleteMail');
+    onCheckRead() {
+      this.checked = [];
+      this.isChecked = false;
+      this.checked = this.mails.filter(m => m.readAt);
+      this.$store.commit(Mutations.MAIL_CHECK_READ, this.checked);
+    },
+    onCheckUnread() {
+      this.checked = [];
+      this.isChecked = false;
+      this.checked = this.mails.filter(m => !m.readAt);
+      this.$store.commit(Mutations.MAIL_CHECK_UNREAD, this.checked);
+    },
+    onSelectMail(mail) {
+      this.$store.commit(Mutations.MAIL_SELECT, mail);
+    },
+    onCheckMail() {
+      this.isChecked = false;
+      this.$store.commit(Mutations.MAIL_CHECK, this.checked);
+    },
+    onCheckAll() {
+      this.isChecked = !this.isChecked;
+      this.checked = [];
+      if(this.isChecked) {
+        this.checked = [...this.mails];  
+      }
+      this.$store.commit(Mutations.CHECK_ALL,this.checked, this.checked);
+    },
+    navigateBack(mail) {
+      this.$store.dispatch(Actions.NAVIGATE_BACK, mail);
+    },
+    MarkAsUnread(mail) {
+      this.$store.dispatch(Actions.MARK_AS_UNREAD, mail);
+    },
+    deleteMail(mail) {
+      const action = confirm('are you sure you want to delete this mail !');
+      if(action) {
+        this.$store.dispatch(Actions.MAIL_DELETE, mail);
+      }
+    },
+    onMoveToTrash() {
+      const action = confirm('are you sure you want to delete this mails !');
+      if(action) {
+      this.$store.dispatch(Actions.ON_MOVE_TO_TRASH, this.checked);
+      }
+    },
+    onMarkAsRead() {
+      this.$store.dispatch(Actions.ON_MARK_AS_READ, this.checked);
     },
     paginate(mails) {
       let from = this.page * this.perPage - this.perPage;
@@ -187,20 +201,13 @@ export default {
     goto(page) {
       this.page = page + 1;
     },
-    search(mails) {
-      this.filteredMails = mails;
-    },
-  },
-  watch: {
-    mails() {
-      this.filteredMails = this.mails
-    },
   },
   computed: {
-    ...mapState(['checked']),
+    ...mapGetters(['mails', 'selected']),
+    ...mapState(['mail',]),
 
     paginatedMails() {
-      return this.paginate(this.filteredMails)
+      return this.paginate(this.mails)
     },
   },
 };
@@ -293,9 +300,17 @@ $color_10: #5f6169;
   }
 }
 .dropdown-menu {
-  display: inline-block;
-  width: auto;
+  display: none;
+  position: absolute;
+  background-color: #f9f9f9;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  padding: 12px 16px;
 }
+.btn-group:hover .dropdown-menu {
+  display: block;
+}
+
 .message-options {
   display: flex;
   justify-content: space-between;
@@ -307,4 +322,5 @@ $color_10: #5f6169;
 .select-checkbox {
   align-content: stretch;
 }
+
 </style>

@@ -3,18 +3,10 @@
     <div class="mail-box">
       <aside class="sm-side">
         <profile></profile>
-          <side-navigation 
-            :mails="mails"
-            :filter="filter"
-            @selected-mails="onSelectedMails($event)"
-            @selected-filter="onSelectedFilter($event)"
-            >
-          </side-navigation>
+        <side-navigation></side-navigation>
       </aside>
-
       <aside class="lg-side">
-        <inbox-body :mails="selectedMails" :title="title">
-        </inbox-body>
+        <inbox-body></inbox-body>
       </aside>
     </div>
   </div>
@@ -23,7 +15,8 @@
 import Profile from './components/Profile';
 import InboxBody from './components/InboxBody';
 import SideNavigation from './components/SideNavigation';
-import { mapGetters, mapState } from 'vuex';
+import * as Actions from './store/action-types';
+
 export default {
   name: 'App',
   components: {
@@ -32,20 +25,10 @@ export default {
     Profile,
   },
   mounted() {
-    this.$store.dispatch('getMails');
+    this.$store.dispatch(Actions.MAILS_LOAD);
   },
-  methods: {
-    onSelectedMails(mail) {
-      this.$store.commit('theSelectedMails', mail);
-    },
-    onSelectedFilter(filter) {
-      this.$store.commit('theSelectedFilter', filter);
-    },
-  },
-  computed: {
-    ...mapState(['mails','selectedMails', 'filter']),
-    ...mapGetters(['title']),
-  },
+  methods: {},
+  computed: {},
 };
 </script>
 

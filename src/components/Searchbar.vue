@@ -7,7 +7,8 @@
             type="text"
             class="sr-input"
             placeholder="Search Mail"
-            v-model="keyword"
+            :value="keyword"
+            @change="onType"
           />
           <button class="btn sr-btn" type="submit">
             <i class="fa fa-search"></i>
@@ -18,39 +19,33 @@
 </template>
 
 <script>
+import { mapGetters, mapState } from 'vuex';
+import * as Mutations from '../store/mutation-types';
+
 export default {
   name: 'Searchbar',
-  props: {
-    mails: {
-      type: Array,
-      required: true,
-      default: function () {
-        return [];
-      }, 
-    },
-    title: {
-      type: String,
-    },
-  },
   data() {
     return {
-      keyword: '',
-      foundedMails: [],
+      typedKeyWord: '',
     };
   },
+
   methods: {
     search(e) {
-      e.preventDefault()
-      this.foundedMails = this.mails.filter((mail) => {
-        if(mail.deletedAt === null || mail.deletedAt !== null) {
-          return mail.sender.name
-          .toLowerCase()
-          .includes(this.keyword.toLowerCase())
-        }        
-      });
-      this.$emit('searching', this.foundedMails);
+      e.preventDefault();
+      this.$store.commit(Mutations.SEARCH, this.typedKeyWord);
     },
+    onType(e) {
+      console.log(e)
+      this.typedKeyWord = e.target.value;
+    }
   },
+  computed :{
+    ...mapGetters(['title']),
+    ...mapState({
+      keyword: state => state.filters.keyword
+    })
+  }
 };
 </script>
 

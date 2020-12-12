@@ -15,23 +15,23 @@
               <h4 class="modal-title">Compose</h4>
             </div>
             <div class="modal-body">
-              <form role="form" class="form-horizontal" @submit.prevent="sendMessage">
+              <form role="form" class="form-horizontal" @submit.prevent="sendMessage(compose)">
                 <div class="form-group">
                   <label class="col-lg-2 control-label" >To</label>
                   <div class="col-lg-10">
-                    <input type="text" placeholder="" id="inputEmail1" class="form-control" v-model="message.sender.name"/>
+                    <input type="text" placeholder="To" id="inputEmail1" class="form-control" v-model="compose.sender.name"/>
                   </div>
                 </div>
                 <div class="form-group">
                   <label class="col-lg-2 control-label">Subject</label>
                   <div class="col-lg-10">
-                    <input type="text" placeholder="" id="inputPassword1" class="form-control" v-model="message.subject"/>
+                    <input type="text" placeholder="Subject" id="inputPassword1" class="form-control" v-model="compose.subject"/>
                   </div>
                 </div>
                 <div class="form-group">
                   <label class="col-lg-2 control-label">Message</label>
                   <div class="col-lg-10">
-                    <textarea rows="10" cols="30" class="form-control" id="" name="" v-model="message.content"></textarea>
+                    <textarea rows="10" placeholder="write a new message" cols="30" class="form-control" v-model="compose.content"></textarea>
                   </div>
                 </div>
 
@@ -58,29 +58,37 @@
 </template>
 
 <script>
-import {  mapGetters, mapState } from 'vuex';
+import { mapState } from 'vuex';
+import * as Actions from '../store/action-types';
+
 export default {
   name: 'compose',
-  props:{
-    mails: {
-      type: Array,
-      required: true,
-      default: function() {
-        return [];
-      },
-    },
-  },
   data() {
     return {
       showModal: false,
- 
+      compose: {
+        subject: '',
+        content: '',
+        sender: {
+          name: '',
+          email: '',
+        },
+        important: null,
+        attachment: null,
+        sentAt: null,
+        readAt: null,
+        deletedAt: null
+      }
     };
   },
   methods: {
-    ...mapGetters(['sendMessage']),
+    sendMessage(compose) {
+      console.log(compose);
+      this.$store.dispatch(Actions.MAIL_COMPOSE, this.compose);
+    }
   },
   computed: {
-    ...mapState(['message']),
+    ...mapState({profile : state => state.profile})
   },
 };
 </script>
