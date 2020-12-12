@@ -1,16 +1,15 @@
 <template>
   <div class="inbox-head">
-    <h3>{{ currentView }}</h3>
-    <form action="#" class="pull-right position">
+    <h3>{{ title }}</h3>
+    <form class="pull-right position" @submit="search($event)">
       <div class="input-append">
         <input
           type="text"
           class="sr-input"
           placeholder="Search Mail"
           v-model="keyword"
-          @keyup.enter="search()"
         />
-        <button class="btn sr-btn" type="button" @click="search()">
+        <button class="btn sr-btn" type="submit">
           <i class="fa fa-search"></i>
         </button>
       </div>
@@ -29,7 +28,7 @@ export default {
         return [];
       },
     },
-    currentView: {
+    title: {
       type: String,
     },
   },
@@ -40,7 +39,8 @@ export default {
     };
   },
   methods: {
-    search() {
+    search(event) {
+      event.preventDefault();
       this.foundedMails = this.mails.filter((mail) => {
         if(mail.deletedAt == null) {
           return mail.sender.name
@@ -49,7 +49,6 @@ export default {
         }        
       });
       this.$emit('searching', this.foundedMails);
-      this.keyword = '';
     },
   },
 };
