@@ -1,21 +1,11 @@
 <template>
   <div class="inbox-body">
-    <searchbar 
-    :mails="mails" 
-    :title="title" 
-    @searching="search($event)"
-    >
-    </searchbar>
+    <searchbar  :mails="mails" :title="title" @searching="search($event)"></searchbar>
     <div class="mail-option">
       <div class="chk-all">
-        <input type="checkbox" class="mail-checkbox mail-group-checkbox" />
+        <input type="checkbox" class="mail-checkbox mail-group-checkbox" v-model="checkAll"/>
         <div class="btn-group">
-          <a
-            data-toggle="dropdown"
-            href="#"
-            class="btn mini all"
-            aria-expanded="false"
-          >
+          <a data-toggle="dropdown" class="btn mini all" aria-expanded="false">
             All
             <i class="fa fa-angle-down"></i>
           </a>
@@ -28,23 +18,12 @@
       </div>
 
       <div class="btn-group">
-        <a
-          data-original-title="Refresh"
-          data-placement="top"
-          data-toggle="dropdown"
-          href="#"
-          class="btn mini tooltips"
-        >
+        <a data-original-title="Refresh" data-placement="top" data-toggle="dropdown" href="#" class="btn mini tooltips" >
           <i class="fa fa-refresh"></i>
         </a>
       </div>
       <div class="btn-group hidden-phone">
-        <a
-          data-toggle="dropdown"
-          href="#"
-          class="btn mini blue"
-          aria-expanded="false"
-        >
+        <a data-toggle="dropdown" href="#" class="btn mini blue" aria-expanded="false">
           More
           <i class="fa fa-angle-down"></i>
         </a>
@@ -89,9 +68,13 @@
       <tbody v-for="mail in paginatedMails" :key="mail">
         <tr :class="{ unread: mail.readAt == null, read: mail.readAt != null }">
           <td class="inbox-small-cells">
-            <input type="checkbox" class="mail-checkbox" />
+            <input type="checkbox" class="mail-checkbox" v-model="checked" :value="mail"/>
           </td>
-          <td class="inbox-small-cells"><i class="fa fa-star"></i></td>
+          <td class="inbox-small-cells">
+            <a v-if="typeof mail.important !== true" @click.prevent.stop="mail.important = !mail.important">
+              <i :class="['fa', 'fa-star', { 'inbox-started': mail.important }]"></i>
+            </a>
+          </td>
           <td class="view-message dont-show">{{ mail.sender.name }}</td>
           <td class="view-message">{{ mail.subject }}</td>
           <td class="view-message inbox-small-cells">
@@ -137,6 +120,7 @@ export default {
       perPage: 20,
       keyword: "",
       filteredMails: [],
+      checked: [],
     };
   },
   methods: {
@@ -160,6 +144,20 @@ export default {
   computed: {
     paginatedMails() {
       return this.paginate(this.filteredMails);
+    },
+    checkAll: {
+      get() {
+        return this.filteredMails ? this.checked.length == this.filteredMails.length : false;
+      },
+      set(value) {
+        var checked = [];
+        if (value) {
+          this.filteredMails.forEach(mail => {
+            checked.push(mail);
+          });
+        }
+        this.checked = checked;
+      }
     },
   },
 };
