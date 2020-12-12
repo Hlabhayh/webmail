@@ -1,7 +1,7 @@
 <template>
   <div class="user-head">
     <a class="inbox-avatar" href="javascript:;">
-      <img width="64" hieght="60" :src="profile.avatar" >
+      <img width="64" hieght="60" src="../assets/avatar.jpg" >
     </a>
     <div class="user-name">
       <h5>
@@ -19,24 +19,18 @@
 </template>
 
 <script>
-import axios from 'axios';
-
+import {  mapState  } from 'vuex';
+import * as Actions from '../store/action-types';
 export default {
   name: 'Profile',
-  data() {
-    return {
-      profile: {},
-    }; 
-  },
-  mounted () {
-    axios.get('http://localhost:3000/profile')
-    .then(response => {
-      
-      this.profile = response.data;
-    })
-    .catch(function (error) {
-      console.error(error);
-    });
+
+mounted() {
+  this.$store.dispatch(Actions.PROFILE_LOAD);
+},
+  computed : {
+    ...mapState({
+      profile: state => state.profile, 
+    }),
   }
 };
 </script>

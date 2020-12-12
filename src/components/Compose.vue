@@ -1,10 +1,11 @@
 <template>
+  <div>
     <div class="inbox-body">
-      <a data-toggle="modal" title="Compose" class="btn btn-compose" @click="showModal = !showModal">
+      <a data-toggle="modal" title="Compose" class="btn btn-compose"  @click="showModal = !showModal">
         Compose
       </a>
       <!-- Modal -->
-      <div aria-hidden="true" aria-labelledby="myModalLabel" role="dialog" tabindex="-1" id="myModal" v-if="showModal">
+      <div aria-labelledby="myModalLabel" role="dialog" id="myModal" v-if="showModal">
         <div class="modal-dialog">
           <div class="modal-content">
             <div class="modal-header">
@@ -14,25 +15,26 @@
               <h4 class="modal-title">Compose</h4>
             </div>
             <div class="modal-body">
-              <form role="form" class="form-horizontal" @submit.prevent="sendMessage">
+              <form role="form" class="form-horizontal" @submit.prevent="sendMessage(compose)">
                 <div class="form-group">
-                  <label class="col-lg-2 control-label">To</label>
+                  <label class="col-lg-2 control-label" >To</label>
                   <div class="col-lg-10">
-                    <input type="text" placeholder="" id="inputEmail1" class="form-control" v-model="message.sender.name"/>
+                    <input type="text" placeholder="To" id="inputEmail1" class="form-control" v-model="compose.sender.name"/>
                   </div>
                 </div>
                 <div class="form-group">
                   <label class="col-lg-2 control-label">Subject</label>
                   <div class="col-lg-10">
-                    <input type="text" placeholder="" id="inputPassword1" class="form-control" v-model="message.subject"/>
+                    <input type="text" placeholder="Subject" id="inputPassword1" class="form-control" v-model="compose.subject"/>
                   </div>
                 </div>
                 <div class="form-group">
                   <label class="col-lg-2 control-label">Message</label>
                   <div class="col-lg-10">
-                    <textarea rows="10" cols="30" class="form-control" id="" name="" v-model="message.content"></textarea>
+                    <textarea rows="10" placeholder="write a new message" cols="30" class="form-control" v-model="compose.content"></textarea>
                   </div>
                 </div>
+
                 <div class="form-group">
                   <div class="col-lg-offset-2 col-lg-10">
                     <span class="btn green fileinput-button">
@@ -52,25 +54,65 @@
       </div>
       <!-- /.modal -->
     </div>
+  </div>
 </template>
 
 <script>
-import { mapGetters, mapState } from 'vuex';
+import { mapState } from 'vuex';
+import * as Actions from '../store/action-types';
+
 export default {
+  name: 'compose',
   data() {
     return {
       showModal: false,
+      compose: {
+        subject: '',
+        content: '',
+        sender: {
+          name: '',
+          email: '',
+        },
+        important: null,
+        attachment: null,
+        sentAt: null,
+        readAt: null,
+        deletedAt: null
+      }
     };
   },
   methods: {
-    ...mapGetters(['sendMessage']),
+    sendMessage(compose) {
+      console.log(compose);
+      this.$store.dispatch(Actions.MAIL_COMPOSE, this.compose);
+    }
   },
   computed: {
-    ...mapState(['message']),
+    ...mapState({profile : state => state.profile})
   },
-}
+};
 </script>
 
-<style>
+<style lang="scss">
+$font_family_1: "Open Sans", sans-serif;
 
+.modal-header {
+  h4.modal-title {
+    font-family: $font_family_1;
+    font-weight: 300;
+  }
+}
+.modal-body {
+  label {
+    font-family: $font_family_1;
+    font-weight: 400;
+  }
+}
+.modal-dialog {
+  display:inline-flex;
+  position: relative;
+}
+.modal-content {
+  width: 100%;
+}
 </style>

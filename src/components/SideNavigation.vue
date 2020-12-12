@@ -2,23 +2,9 @@
   <div>
     <compose></compose>
     <ul class="inbox-nav inbox-divider">
-      <li :class="{active: filter === 'inbox'}">
-        <a href="#" @click.prevent="receivedMails"><i class="fa fa-inbox"></i> Inbox 
-        <span class="label label-success pull-right">{{ inboxCounter }}</span></a>
-      </li>
-      <li :class="{active: filter === 'sent'}">
-        <a href="#" @click.prevent="sentMails"><i class="fa fa-envelope-o"></i> Sent Mail
-          <span class="label label-info pull-right">{{ sentCounter }}</span>
-        </a>
-      </li>
-      <li :class="{active: filter === 'important'}">
-        <a href="#"  @click.prevent="importantMails"><i class="fa fa-bookmark-o"></i> Important
-          <span class="label label-default pull-right">{{ importantCounter }}</span>
-        </a>
-      </li>
-      <li :class="{active: filter === 'trash'}">
-        <a href="#"  @click.prevent="trashMails"><i class="fa fa-trash-o"></i> Trash
-          <span class="label label-danger pull-right">{{ trashCounter }}</span>
+      <li v-for="section in sections" :key="section.key" :class="{active: section.active}">
+        <a href="#" @click.prevent="changeSection(section)"><i :class="sections.icon" class="fa"></i> {{ section.label }} 
+        <span class="label pull-right" :class="section.color">{{ section.total }}</span>
         </a>
       </li>
     </ul>
@@ -47,93 +33,21 @@
 </template>
 
 <script>
-import Compose from './Compose'; 
+import Compose from './Compose';
+import { mapGetters } from 'vuex';
+import * as Mutations from '../store/mutation-types';
+
 export default {
   name: "SideNavigation",
-  props: {
-    mails: {
-      type: Array,
-      required: true,
-      default: function () {
-        return [];
-      },
-    },
-    filter: {
-      type: String,
-    },
-  },
   components: {
     Compose,
   },
-  updated() {
-    switch (this.filter) {
-      case 'inbox':
-        this.receivedMails();
-        break;
-      case 'sent':
-        this.sentMails();
-        break;
-      case 'important':
-        this.importantMails();
-        break;
-      case 'trash':
-        this.trashMails();
-        break;
-    
-      default:
-        break;
-    }
-  },
   computed: {
-    inbox() {
-      return this.mails.filter((mail) => {
-        return mail.sent === false && mail.deletedAt === null;
-      });
-    },
-    sent() {
-      return this.mails.filter((mail) => {
-        return mail.sent === true && mail.deletedAt === null;
-      });
-    },
-    trash() {
-      return this.mails.filter((mail) => {
-        return mail.deletedAt !== null;
-      });
-    },
-    important() {
-      return this.mails.filter((mail) => {
-        return mail.important === true && mail.deletedAt === null;
-      });
-    },
-    inboxCounter() {
-      return this.inbox.length;
-    },
-    sentCounter() {
-      return this.sent.length;
-    },
-    trashCounter() {
-      return this.trash.length;
-    },
-    importantCounter() {
-      return this.important.length;
-    },
+    ...mapGetters(['sections']),
   },
   methods: {
-    receivedMails() {
-      this.$emit('selected-filter', 'inbox'),
-      this.$emit('selected-mails', this.inbox);
-    },
-    sentMails() {
-      this.$emit('selected-filter', 'sent'),
-      this.$emit('selected-mails', this.sent);
-    },
-    importantMails() {
-      this.$emit('selected-filter', 'important'),
-      this.$emit('selected-mails', this.important);
-    },
-    trashMails() {
-      this.$emit('selected-filter', 'trash'),
-      this.$emit('selected-mails', this.trash);
+    changeSection(section) {
+      this.$store.commit(Mutations.SECTION_CHANGE, section.key);
     },
   },
 };
@@ -144,7 +58,6 @@ $color_1: #fff;
 $color_4: #6a6a6a;
 $color_5: #5c5c5e;
 $color_6: #9d9f9e;
-$font_family_1: "Open Sans", sans-serif;
 
 ul.inbox-nav {
   display: inline-block;
@@ -254,16 +167,5 @@ ul.labels-info {
     background: none repeat scroll 0 0 #009da7;
   }
 }
-.modal-header {
-  h4.modal-title {
-    font-family: $font_family_1;
-    font-weight: 300;
-  }
-}
-.modal-body {
-  label {
-    font-family: $font_family_1;
-    font-weight: 400;
-  }
-}
+
 </style>

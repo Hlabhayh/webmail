@@ -1,50 +1,53 @@
 <template>
-  <div class="inbox-body">
-    <searchbar  :mails="mails" :title="title" @searching="search($event)"></searchbar>
+  <div class="inbox-body" >
+    <searchbar></searchbar>
     <div class="mail-option">
       <div class="chk-all">
-        <input type="checkbox" class="mail-checkbox mail-group-checkbox" v-model="checkAll"/>
-        <div class="btn-group">
-          <a data-toggle="dropdown" class="btn mini all" aria-expanded="false">
-            All
+        <input type="checkbox" class="mail-checkbox mail-group-checkbox" @click="onCheckAll" v-model="isChecked" />
+        <div class="btn-group" >
+          <a data-toggle="dropdown" class="btn mini all"> All
             <i class="fa fa-angle-down"></i>
           </a>
-          <ul class="dropdown-menu">
-            <li><a href="#"> None</a></li>
-            <li><a href="#"> Read</a></li>
-            <li><a href="#"> Unread</a></li>
-          </ul>
+          <div id="box1" >
+            <ul class="dropdown-menu">
+              <li><a  @click.prevent="onCheckNone"  style="cursor: pointer;"> None</a></li>
+              <li><a  @click.prevent="onCheckRead" style="cursor: pointer;"> Read</a></li>
+              <li><a  @click.prevent="onCheckUnread" style="cursor: pointer;"> Unread</a></li>
+            </ul>
+          </div>
         </div>
       </div>
-
       <div class="btn-group">
-        <a data-original-title="Refresh" data-placement="top" data-toggle="dropdown" href="#" class="btn mini tooltips" >
+        <a data-original-title="Refresh" data-placement="top" data-toggle="dropdown" href="/public/index.html" class="btn mini tooltips">
           <i class="fa fa-refresh"></i>
         </a>
       </div>
       <div class="btn-group hidden-phone">
-        <a data-toggle="dropdown" href="#" class="btn mini blue" aria-expanded="false">
+        <a data-toggle="dropdown" class="btn mini blue">
           More
           <i class="fa fa-angle-down"></i>
         </a>
-        <ul class="dropdown-menu">
-          <li>
-            <a href="#"><i class="fa fa-pencil"></i> Mark as Read</a>
-          </li>
-          <li>
-            <a href="#"><i class="fa fa-ban"></i> Spam</a>
-          </li>
-          <li class="divider"></li>
-          <li>
-            <a href="#"><i class="fa fa-trash-o"></i> Delete</a>
-          </li>
-        </ul>
+        <div id="box2">
+          <ul class="dropdown-menu">
+            <li>
+              <a @click.prevent="onMarkAsRead" style="cursor: pointer;"><i class="fa fa-pencil"></i> Mark as Read</a>
+            </li>
+            <li>
+              <a href="#" style="cursor: pointer;"><i class="fa fa-ban"></i> Spam</a>
+            </li>
+            <li class="divider"></li>
+            <li>
+              <a  @click.prevent="onMoveToTrash" style="cursor: pointer;"><i class="fa fa-trash-o" ></i> Delete</a>
+            </li>
+          </ul>
+        </div>
       </div>
       <div class="btn-group">
-        <a data-toggle="dropdown" href="#" class="btn mini blue">
+        <a data-toggle="dropdown" class="btn mini blue">
           Move to
           <i class="fa fa-angle-down"></i>
         </a>
+        <div id="box3">
         <ul class="dropdown-menu">
           <li>
             <a href="#"><i class="fa fa-pencil"></i> Mark as Read</a>
@@ -57,107 +60,154 @@
             <a href="#"><i class="fa fa-trash-o"></i> Delete</a>
           </li>
         </ul>
+        </div>
       </div>
-      <paginator
-        :total="filteredMails.length"
-        :per-page="perPage"
-        @page="goto($event)"
-      ></paginator>
+      <paginator :total="mails.length" :per-page="perPage" @page="goto($event)" ></paginator>
     </div>
-    <table class="table table-inbox table-hover">
-      <tbody v-for="mail in paginatedMails" :key="mail">
-        <tr :class="{ unread: mail.readAt == null, read: mail.readAt != null }">
+    <table class="table table-inbox table-hover" v-if="!mail">
+      <tbody v-for="m in paginatedMails" :key="m.id">   
+        <tr :class="{ unread: !m.readAt, read: m.readAt}">
           <td class="inbox-small-cells">
-            <input type="checkbox" class="mail-checkbox" v-model="checked" :value="mail"/>
+            <input type="checkbox" class="mail-checkbox" @change.prevent="onCheckMail" :value="m"  v-model="checked" :checked="selected[m.id]"/>
           </td>
           <td class="inbox-small-cells">
-            <a v-if="typeof mail.important !== true" @click.prevent.stop="mail.important = !mail.important">
-              <i :class="['fa', 'fa-star', { 'inbox-started': mail.important }]"></i>
+            <a href="#">
+              <i class="fa fa-star" :class="{'inbox-started': m.important }" @click.prevent="OnImportant(m)"  :value="m.id"></i>
             </a>
           </td>
-          <td class="view-message dont-show">{{ mail.sender.name }}</td>
-          <td class="view-message">{{ mail.subject }}</td>
+          <td class="view-message dont-show">{{ m.sender.name }}</td>
+          <td class="view-message"  @click="onSelectMail(m)">{{ m.subject }}</td>
           <td class="view-message inbox-small-cells">
-            <i :class="{ 'fa fa-paperclip': mail.attachment != null }"></i>
+            <i v-if="m.attachment" class="fa fa-paperclip"></i>
           </td>
-          <td class="view-message text-right">{{ mail.sentAt }}</td>
+          <td class="view-message text-right">{{ m.sentAt }}</td>
         </tr>
       </tbody>
-       <tbody v-if="filteredMails == !mails"> <h1> NOT FOUNDED ! </h1> </tbody>
     </table>
+    <table class="table table-inbox table-hover" v-if="mail">
+      <tbody>
+        <div class="message-box">
+          <div class="message-options">
+            <button class="btn btn-primary" @click="navigateBack(mail)">
+              <i class="fa fa-arrow-left" aria-hidden="true"></i> Back
+            </button>
+            <button class="btn btn-success" @click="MarkAsUnread(mail)">
+              <span class="glyphicon glyphicon-envelope"></span> mark as unread
+            </button>
+            <button class="btn btn-danger" @click="deleteMail(mail)">
+              <span class="btn-label"><i class="glyphicon glyphicon-trash"></i></span> Delete
+            </button>
+          </div>
+          <p><strong>From: </strong>{{ mail.sentAt }}</p>
+          <p><strong>Date: </strong>{{ mail.sender.name }}</p>        
+          <p><strong>Message :</strong>{{ mail.content }}</p>
+          <hr>
+          <div class="message"></div>
+          <div>
+            <h4>{{ mail.attachment }}</h4>
+            <ul>
+            </ul>
+          </div>
+        </div>
+      </tbody>
+    </table>
+    
   </div>
 </template>
 
 <script>
-import Paginator from "./Paginator";
-import Searchbar from "./Searchbar";
+import {  mapGetters, mapState } from 'vuex';
+import Paginator from './Paginator';
+import Searchbar from './Searchbar';
+import * as Mutations from '../store/mutation-types';
+import * as Actions from '../store/action-types';
 
 export default {
-  name: "InboxBody",
+  name: 'InboxBody',
   components: {
     Paginator,
     Searchbar,
-  },
-  props: {
-    mails: {
-      type: Array,
-      required: true,
-      default: function () {
-        return [];
-      },
-    },
-    title: {
-      type: String,
-      required: true,
-      default: function () {
-        return '';
-      },
-    },
   },
   data() {
     return {
       page: 1,
       perPage: 20,
-      keyword: "",
-      filteredMails: [],
       checked: [],
+      isChecked: false,
     };
   },
   methods: {
+    OnImportant(m) {
+      this.$store.dispatch(Actions.ON_IMPORTANT, m)
+    },
+    onCheckNone() {
+      this.checked = [];
+      this.isChecked = false;
+      this.$store.commit(Mutations.MAIL_UNCHECK_ALL);
+    },
+    onCheckRead() {
+      this.checked = [];
+      this.isChecked = false;
+      this.checked = this.mails.filter(m => m.readAt);
+      this.$store.commit(Mutations.MAIL_CHECK_READ, this.checked);
+    },
+    onCheckUnread() {
+      this.checked = [];
+      this.isChecked = false;
+      this.checked = this.mails.filter(m => !m.readAt);
+      this.$store.commit(Mutations.MAIL_CHECK_UNREAD, this.checked);
+    },
+    onSelectMail(mail) {
+      this.$store.commit(Mutations.MAIL_SELECT, mail);
+    },
+    onCheckMail() {
+      this.isChecked = false;
+      this.$store.commit(Mutations.MAIL_CHECK, this.checked);
+    },
+    onCheckAll() {
+      this.isChecked = !this.isChecked;
+      this.checked = [];
+      if(this.isChecked) {
+        this.checked = [...this.mails];  
+      }
+      this.$store.commit(Mutations.CHECK_ALL,this.checked, this.checked);
+    },
+    navigateBack(mail) {
+      this.$store.dispatch(Actions.NAVIGATE_BACK, mail);
+    },
+    MarkAsUnread(mail) {
+      this.$store.dispatch(Actions.MARK_AS_UNREAD, mail);
+    },
+    deleteMail(mail) {
+      const action = confirm('are you sure you want to delete this mail !');
+      if(action) {
+        this.$store.dispatch(Actions.MAIL_DELETE, mail);
+      }
+    },
+    onMoveToTrash() {
+      const action = confirm('are you sure you want to delete this mails !');
+      if(action) {
+      this.$store.dispatch(Actions.ON_MOVE_TO_TRASH, this.checked);
+      }
+    },
+    onMarkAsRead() {
+      this.$store.dispatch(Actions.ON_MARK_AS_READ, this.checked);
+    },
     paginate(mails) {
       let from = this.page * this.perPage - this.perPage;
       let to = this.page * this.perPage;
       return mails.slice(from, to);
     },
-    search(mails) {
-      this.filteredMails = mails;
-    },
     goto(page) {
       this.page = page + 1;
     },
   },
-  watch: {
-    mails() {
-      this.filteredMails = this.mails;
-    },
-  },
   computed: {
+    ...mapGetters(['mails', 'selected']),
+    ...mapState(['mail',]),
+
     paginatedMails() {
-      return this.paginate(this.filteredMails);
-    },
-    checkAll: {
-      get() {
-        return this.filteredMails ? this.checked.length == this.filteredMails.length : false;
-      },
-      set(value) {
-        var checked = [];
-        if (value) {
-          this.filteredMails.forEach(mail => {
-            checked.push(mail);
-          });
-        }
-        this.checked = checked;
-      }
+      return this.paginate(this.mails)
     },
   },
 };
@@ -166,7 +216,7 @@ export default {
 <style lang="scss">
 $color_8: #f78a09;
 $color_9: #d5d5d5;
-$color_10: #afafaf;
+$color_10: #5f6169;
 
 .mail-option {
   display: inline-block;
@@ -221,7 +271,7 @@ $color_10: #afafaf;
   margin-bottom: 0;
   tr {
     td {
-      padding: 12px !important;
+      padding: 10px !important;
       &:hover {
         cursor: pointer;
       }
@@ -249,4 +299,28 @@ $color_10: #afafaf;
     font-family:Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
   }
 }
+.dropdown-menu {
+  display: none;
+  position: absolute;
+  background-color: #f9f9f9;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  padding: 12px 16px;
+}
+.btn-group:hover .dropdown-menu {
+  display: block;
+}
+
+.message-options {
+  display: flex;
+  justify-content: space-between;
+  margin: 10px;
+}
+.message-box {
+  margin: 10px;
+}
+.select-checkbox {
+  align-content: stretch;
+}
+
 </style>

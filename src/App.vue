@@ -3,50 +3,32 @@
     <div class="mail-box">
       <aside class="sm-side">
         <profile></profile>
-        <side-navigation 
-        :mails="mails"
-        :filter="filter"
-        @selected-filter="onSelectedFilter($event)"
-        @selected-mails="onSelectedMails($event)"
-        >
-        </side-navigation>
+        <side-navigation></side-navigation>
       </aside>
-
       <aside class="lg-side">
-        <inbox-body :mails="selectedMails" :title="title"></inbox-body>
+        <inbox-body></inbox-body>
       </aside>
     </div>
   </div>
 </template>
 <script>
-import Profile from "./components/Profile";
-import InboxBody from "./components/InboxBody";
-import SideNavigation from "./components/SideNavigation";
-import { mapGetters, mapState } from 'vuex';
+import Profile from './components/Profile';
+import InboxBody from './components/InboxBody';
+import SideNavigation from './components/SideNavigation';
+import * as Actions from './store/action-types';
 
 export default {
-  name: "App",
+  name: 'App',
   components: {
     SideNavigation,
     InboxBody,
     Profile,
   },
   mounted() {
-    this.$store.dispatch('getMails');
+    this.$store.dispatch(Actions.MAILS_LOAD);
   },
-  methods: {
-    onSelectedMails(mails) {
-      this.$store.commit('onSelectedMails', mails);
-    },
-    onSelectedFilter(filter) {
-      this.$store.commit('onSelectedFilter', filter);
-    },
-  },
-
-  computed: {
-    ...mapState(['mails', 'selectedMails', 'filter']),
-    ...mapGetters(['title']),
-  },
+  methods: {},
+  computed: {},
 };
 </script>
 

@@ -1,56 +1,51 @@
 <template>
-  <div class="inbox-head">
-    <h3>{{ title }}</h3>
-    <form class="pull-right position" @submit="search($event)">
-      <div class="input-append">
-        <input
-          type="text"
-          class="sr-input"
-          placeholder="Search Mail"
-          v-model="keyword"
-        />
-        <button class="btn sr-btn" type="submit">
-          <i class="fa fa-search"></i>
-        </button>
-      </div>
-    </form>
-  </div>
+<div class="inbox-head">
+      <h3>{{ title }}</h3>
+      <form class="pull-right position" @submit="search($event)">
+        <div class="input-append">
+          <input
+            type="text"
+            class="sr-input"
+            placeholder="Search Mail"
+            :value="keyword"
+            @change="onType"
+          />
+          <button class="btn sr-btn" type="submit">
+            <i class="fa fa-search"></i>
+          </button>
+        </div>
+      </form>
+    </div>
 </template>
 
 <script>
+import { mapGetters, mapState } from 'vuex';
+import * as Mutations from '../store/mutation-types';
+
 export default {
-  name: "Searchbox",
-  props: {
-    mails: {
-      type: Array,
-      required: true,
-      default: () => {
-        return [];
-      },
-    },
-    title: {
-      type: String,
-    },
-  },
+  name: 'Searchbar',
   data() {
     return {
-      keyword: "",
-      filteredMails: [],
+      typedKeyWord: '',
     };
   },
+
   methods: {
-    search(event) {
-      event.preventDefault();
-      this.foundedMails = this.mails.filter((mail) => {
-        if(mail.deletedAt == null) {
-          return mail.sender.name
-          .toLowerCase()
-          .includes(this.keyword.toLowerCase())
-        }        
-      });
-      this.$emit('searching', this.foundedMails);
+    search(e) {
+      e.preventDefault();
+      this.$store.commit(Mutations.SEARCH, this.typedKeyWord);
     },
+    onType(e) {
+      console.log(e)
+      this.typedKeyWord = e.target.value;
+    }
   },
+  computed :{
+    ...mapGetters(['title']),
+    ...mapState({
+      keyword: state => state.filters.keyword
+    })
+  }
 };
 </script>
 
